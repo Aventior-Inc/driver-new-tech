@@ -46,6 +46,7 @@ jobs:
           ls -al
           sudo apt update
           cd /home/ubuntu/driver-new-tech
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           ls -al
           "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> /home/ubuntu/driver-new-tech/.env
           "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
@@ -60,10 +61,6 @@ jobs:
           "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
           "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
           "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
-          # echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          # chmod 600 private_key.pem
-          # ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
-          # cd ~/driver/driver-new-tech
           chmod +x production_host.sh
           ./production_host.sh
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
