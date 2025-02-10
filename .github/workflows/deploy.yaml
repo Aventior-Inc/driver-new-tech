@@ -38,11 +38,7 @@ jobs:
       - name: Get public IP of GitHub Actions Runner
         id: get_ip
         run: |
-          aws ec2 authorize-security-group-ingress \
-            --group-id ${{ SECURITY_GROUP_ID }} \
-            --protocol tcp \
-            --port 22 \
-            --cidr $IP_ADDRESS \
+          aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS \
       
       - name: Create .env file
         run: |
