@@ -98,8 +98,9 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
             # Change to project directory and pull the latest image from ECR
-            cd /opt
-            
+            cd /home/ubuntu
+            pwd
+            ls -al
             # Ensure Docker Compose is available
             sudo apt-get install -y docker-compose
 
