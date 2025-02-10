@@ -67,6 +67,20 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Get public IP of GitHub Actions Runner
+        id: get_ip
+        run: |
+          # Fetch the public IP address of the GitHub Actions runner using a public service
+          IP_ADDRESS=$(curl -s https://ifconfig.me)
+          echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
+          echo "GitHub Actions Runner IP: $IP_ADDRESS"
+
+      - name: whitelisting ip on security group
+        run: |
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
+          aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
         
       - name: Deploy on EC2 with Docker Compose
         run: |
