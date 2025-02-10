@@ -43,7 +43,7 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           ls -al
           # Give execute permission to production_host.sh
-          chmod +x /home/ubuntu/driver-new-tech/production_host.sh
+          chmod +x production_host.sh
           # Run the production_host.sh script
           ./production_host.sh
 
