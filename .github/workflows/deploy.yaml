@@ -19,11 +19,15 @@ jobs:
         with:
           repository: Aventior-Inc/driver-new-tech
           ref: staging
-          path: /home/ubuntu/driver
 
       - name: Create .env file
         run: |
-          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> /home/ubuntu/driver/driver-new-tech/.env
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
+          mkdir -p ~/driver
+          cd ~/driver/driver-new-tech
+          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> driver-new-tech/.env
           "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver/driver-new-tech/.env
           "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver/driver-new-tech/.env
           "echo PGPASSWORD: ${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver/driver-new-tech/.env 
@@ -37,9 +41,9 @@ jobs:
           "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver/driver-new-tech/.env
           "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver/driver-new-tech/.env
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
-          cd ~/driver/driver-new-tech
+          # chmod 600 private_key.pem
+          # ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
+          # cd ~/driver/driver-new-tech
           chmod +x production_host.sh
           ./production_host.sh
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
