@@ -84,10 +84,12 @@ jobs:
 
       - name: Copy files from Ubuntu Runner to EC2
         run: |
-          # Copy files from GitHub Actions runner to EC2 instance
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
           pwd
           ls -al
-          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -r /home/runner/work/driver-new-tech/* ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r /home/runner/work/driver-new-tech/* ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/
+          rm private_key.pem
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
