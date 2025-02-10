@@ -38,6 +38,7 @@ jobs:
       - name: whitelisting ip on security group
         run: |
           SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
           aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
       
       - name: Create .env file
