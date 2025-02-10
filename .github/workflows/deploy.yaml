@@ -87,7 +87,7 @@ jobs:
           # Copy files from GitHub Actions runner to EC2 instance
           pwd
           ls -al
-          scp -o StrictHostKeyChecking=no -i ssh-private-key -r /home/runner/work/driver-new-tech/* ubuntu@${{ secrets.HOST_NAME }}:/opt/
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -r /home/runner/work/driver-new-tech/* ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
