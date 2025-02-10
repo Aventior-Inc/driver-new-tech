@@ -48,6 +48,7 @@ jobs:
           ./production_host.sh
            # Build the Docker image
           docker-compose -f docker-compose.yml build
+          docker image ls
 
       - name: Build Docker image and Push to ECR
         run: |
