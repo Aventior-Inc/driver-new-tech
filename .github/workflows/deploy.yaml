@@ -20,6 +20,30 @@ jobs:
           repository: Aventior-Inc/driver-new-tech
           ref: staging
 
+      - name: Get public IP of GitHub Actions Runner
+        id: get_ip
+        run: |
+          # Fetch the public IP address of the GitHub Actions runner using a public service
+          IP_ADDRESS=$(curl -s https://ifconfig.me)
+          echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
+          echo "GitHub Actions Runner IP: $IP_ADDRESS"
+
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get public IP of GitHub Actions Runner
+        id: get_ip
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr $IP_ADDRESS \
+      
       - name: Create .env file
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
