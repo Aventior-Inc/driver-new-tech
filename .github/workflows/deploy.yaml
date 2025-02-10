@@ -56,10 +56,12 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
           
           # Tag the image for ECR
-          docker tag driver-tech:latest ${{ secrets.ECR_REPO }}:latest
+          docker tag driver-django:latest ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          docker tag driver-database:latest  ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
           # Push the image to ECR
-          docker push ${{ secrets.ECR_REPO }}:latest
+          docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
       - name: SSH into EC2 and Deploy with Docker Compose
         uses: webfactory/ssh-agent@v0.5.3
