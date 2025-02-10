@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Create folder if it doesn't exist
-      #   run: |
-      #     mkdir -p /home/ubuntu/driver
-          
       - uses: actions/checkout@v4
         with:
           repository: Aventior-Inc/driver-new-tech
@@ -47,9 +43,11 @@ jobs:
           chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
           pwd
+          ls -al
           sudo apt update
-          mkdir -p ~/driver
-          cd ~/driver/driver-new-tech
+          mkdir -p /home/ubuntu/driver
+          cd /home/ubuntu/driver/
+          ls -al
           "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> driver-new-tech/.env
           "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver/driver-new-tech/.env
           "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver/driver-new-tech/.env
