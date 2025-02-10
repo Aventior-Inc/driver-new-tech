@@ -122,8 +122,8 @@ jobs:
       - name: Remove IP from Security Group
         run: |
           # Set the variables
-          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
-          IP_ADDRESS="${{ secrets.IP_ADDRESS }}/32"  # /32 denotes a single IP address
-          echo "Removing IP $IP_ADDRESS from Security Group $SECURITY_GROUP_ID"
+          # # SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          # IP_ADDRESS="${{ secrets.IP_ADDRESS }}/32"  # /32 denotes a single IP address
+          # echo "Removing IP $IP_ADDRESS from Security Group $SECURITY_GROUP_ID"
           # Revoke the security group ingress rule for the IP
           aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
