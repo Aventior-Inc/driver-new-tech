@@ -16,39 +16,35 @@ jobs:
           repository: Aventior-Inc/driver-new-tech
           ref: staging
 
-      - name: Get public IP of GitHub Actions Runner
-        id: get_ip
-        run: |
-          # Fetch the public IP address of the GitHub Actions runner using a public service
-          IP_ADDRESS=$(curl -s https://ifconfig.me)
-          echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
-          echo "GitHub Actions Runner IP: $IP_ADDRESS"
+      # - name: Get public IP of GitHub Actions Runner
+      #   id: get_ip
+      #   run: |
+      #     # Fetch the public IP address of the GitHub Actions runner using a public service
+      #     IP_ADDRESS=$(curl -s https://ifconfig.me)
+      #     echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
+      #     echo "GitHub Actions Runner IP: $IP_ADDRESS"
 
-      - name: Set up AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      # - name: Set up AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: whitelisting ip on security group
-        run: |
-          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
-          IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
-          aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
+      # - name: whitelisting ip on security group
+      #   run: |
+      #     SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+      #     IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
+      #     aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
       
+      # - name: Create .env file
+      #   run: |
+      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+      #     chmod 600 private_key.pem
+      #     ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
+
       - name: Create .env file
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
-          pwd
-          ls -al
-          sudo apt update
-          cd /home/ubuntu/driver-new-tech
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-          touch /home/ubuntu/driver-new-tech/.env
-          ls -al
+        run: | 
           "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> /home/ubuntu/driver-new-tech/.env
           "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
           "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
@@ -62,14 +58,14 @@ jobs:
           "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
           "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
           "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
-      #     chmod +x production_host.sh
-      #     ./production_host.sh
-      #     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-      #     docker build -t driver-tech .
-      #     docker tag driver-tech:latest $ECR_REPO:latest
-      #     docker push $ECR_REPO:latest
-      #     sudo docker-compose up -d
-      #     EOF
+          chmod +x production_host.sh
+          ./production_host.sh
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+          docker build -t driver-tech .
+          docker tag driver-tech:latest $ECR_REPO:latest
+          docker push $ECR_REPO:latest
+        #  sudo docker-compose up -d
+          EOF
           
       #     rm -f private_key.pem
 
