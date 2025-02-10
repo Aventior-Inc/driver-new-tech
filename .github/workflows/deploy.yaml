@@ -46,6 +46,8 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
+          pwd
+          sudo apt update
           mkdir -p ~/driver
           cd ~/driver/driver-new-tech
           "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> driver-new-tech/.env
