@@ -25,21 +25,22 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Create .env file for the Docker container
-        run: | 
-          mkdir -p /home/ubuntu/driver-new-tech
-          echo "HOST_NAME=${{ secrets.HOST_NAME }}" > /home/ubuntu/driver-new-tech/.env
-          echo "HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
+        run: |
+          pwd
+          ls -al
+          echo "HOST_NAME=${{ secrets.HOST_NAME }}" > .env
+          echo "HOST_URL=${{ secrets.HOST_URL }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> .env
+          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> .env
+          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> .env
+          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> .env
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env
+          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> .env
+          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> .env
+          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
 
       - name: Set execute permissions and run production_host.sh
         run: |
