@@ -1,0 +1,35 @@
+name: CI-CD-Driver
+
+on:
+  # Triggers the workflow on push or pull request events but only for the "staging" branch
+  push:
+    branches: [ "staging" ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+        with:
+          repository: driver-new-tech
+          path: staging
+
+      - name: Create .env file
+        run: |
+          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> .env
+          "echo HOST_URL=${{ secrets.HOST_URL }}" >> .env
+          "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> .env
+          "echo PGPASSWORD: ${{ secrets.PGPASSWORD }}" >> .env 
+          "echo WINDSHAFT_FILES: ${{ secrets.WINDSHAFT_FILES }}" >> .env
+          "echo TIMEZONE: ${{ secrets.TIMEZONE }}" >> .env
+          "echo PROTOCOL: ${{ secrets.PROTOCOL }}" >> .env
+          "echo CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}" >> .env
+          "echo STATIC_ROOT: ${{ secrets.STATIC_ROOT }}" >> .env
+          "echo DIST_ROOT: ${{ secrets.DIST_ROOT }}" >> .env
+          "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> .env
+          "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> .env
+          "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
