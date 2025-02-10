@@ -17,7 +17,7 @@ jobs:
           
       - uses: actions/checkout@v4
         with:
-          repository: driver-new-tech
+          repository: Aventior-Inc/driver-new-tech
           ref: staging
           path: /home/ubuntu/driver
 
