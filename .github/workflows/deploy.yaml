@@ -26,6 +26,7 @@ jobs:
 
       - name: Create .env file for the Docker container
         run: | 
+          mkdir -p /home/ubuntu/driver-new-tech
           echo "HOST_NAME=${{ secrets.HOST_NAME }}" > /home/ubuntu/driver-new-tech/.env
           echo "HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
@@ -39,6 +40,14 @@ jobs:
           echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
           echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
+
+      - name: Set execute permissions and run production_host.sh
+        run: |
+          # Give execute permission to production_host.sh
+          chmod +x /home/ubuntu/driver-new-tech/production_host.sh
+          
+          # Run the production_host.sh script
+          ./production_host.sh
 
       - name: Build Docker image and Push to ECR
         run: |
