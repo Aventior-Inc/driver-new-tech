@@ -11,62 +11,75 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           repository: Aventior-Inc/driver-new-tech
           ref: staging
 
-      - name: Create .env file
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Create .env file for the Docker container
         run: | 
-          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo PGPASSWORD: ${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver-new-tech/.env 
-          "echo WINDSHAFT_FILES: ${{ secrets.WINDSHAFT_FILES }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo TIMEZONE: ${{ secrets.TIMEZONE }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo PROTOCOL: ${{ secrets.PROTOCOL }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo STATIC_ROOT: ${{ secrets.STATIC_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo DIST_ROOT: ${{ secrets.DIST_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
-          "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
-          chmod +x production_host.sh
-          ./production_host.sh
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-          docker build -t driver-tech .
-          docker tag driver-tech:latest $ECR_REPO:latest
-          docker push $ECR_REPO:latest
-        #  sudo docker-compose up -d
+          echo "HOST_NAME=${{ secrets.HOST_NAME }}" > /home/ubuntu/driver-new-tech/.env
+          echo "HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
+
+      - name: Build Docker image and Push to ECR
+        run: |
+          # Log in to ECR
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          
+          # Build the Docker image
+          docker-compose -f /home/ubuntu/driver-new-tech/docker-compose.yml build
+
+          # Tag the image for ECR
+          docker tag driver-tech:latest ${{ secrets.ECR_REPO }}:latest
+
+          # Push the image to ECR
+          docker push ${{ secrets.ECR_REPO }}:latest
+
+      - name: SSH into EC2 and Deploy with Docker Compose
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        
+      - name: Deploy on EC2 with Docker Compose
+        run: |
+          # SSH into EC2 and deploy using Docker Compose
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
+            # Change to project directory and pull the latest image from ECR
+            cd /home/ubuntu/driver-new-tech
+            
+            # Ensure Docker Compose is available
+            sudo apt-get install -y docker-compose
+
+            # Pull the latest Docker image from ECR
+            docker-compose pull
+
+            # Start or restart the Docker containers using docker-compose
+            docker-compose up -d --build
+
+            # Clean up any stopped containers
+            docker container prune -f
           EOF
 
-         # - name: Get public IP of GitHub Actions Runner
-      #   id: get_ip
-      #   run: |
-      #     # Fetch the public IP address of the GitHub Actions runner using a public service
-      #     IP_ADDRESS=$(curl -s https://ifconfig.me)
-      #     echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
-      #     echo "GitHub Actions Runner IP: $IP_ADDRESS"
-
-      # - name: Set up AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.AWS_REGION }}
-
-      # - name: whitelisting ip on security group
-      #   run: |
-      #     SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
-      #     IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
-      #     aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
-      
-      # - name: Create .env file
-      #   run: |
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-      #     chmod 600 private_key.pem
-      #     ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
-      #     rm -f private_key.pem
-
-      # - name: Cleanup
-      #   run: rm -f private_key.pem
+      - name: Cleanup
+        run: |
+          # Clean up any sensitive data or files that were created
+          rm -f private_key.pem
