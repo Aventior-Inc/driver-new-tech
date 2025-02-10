@@ -41,12 +41,9 @@ jobs:
           echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
           echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
-
-      - name: Set execute permissions and run production_host.sh
-        run: |
+          ls -al
           # Give execute permission to production_host.sh
           chmod +x /home/ubuntu/driver-new-tech/production_host.sh
-          
           # Run the production_host.sh script
           ./production_host.sh
 
