@@ -45,23 +45,22 @@ jobs:
           pwd
           ls -al
           sudo apt update
-          mkdir -p /home/ubuntu/driver
-          cd /home/ubuntu/driver/
+          cd /home/ubuntu/driver-new-tech
           ls -al
-          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> driver-new-tech/.env
-          "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo PGPASSWORD: ${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver/driver-new-tech/.env 
-          "echo WINDSHAFT_FILES: ${{ secrets.WINDSHAFT_FILES }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo TIMEZONE: ${{ secrets.TIMEZONE }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo PROTOCOL: ${{ secrets.PROTOCOL }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo STATIC_ROOT: ${{ secrets.STATIC_ROOT }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo DIST_ROOT: ${{ secrets.DIST_ROOT }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver/driver-new-tech/.env
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          "echo HOST_NAME=${{ secrets.HOST_NAME }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo HOST_URL=${{ secrets.HOST_URL }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo POSTGRES_USER: ${{ secrets.POSTGRES_USER }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo PGPASSWORD: ${{ secrets.PGPASSWORD }}" >> /home/ubuntu/driver-new-tech/.env 
+          "echo WINDSHAFT_FILES: ${{ secrets.WINDSHAFT_FILES }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo TIMEZONE: ${{ secrets.TIMEZONE }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo PROTOCOL: ${{ secrets.PROTOCOL }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo STATIC_ROOT: ${{ secrets.STATIC_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo DIST_ROOT: ${{ secrets.DIST_ROOT }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo DRIVER_REDIS_PORT: ${{ secrets.DRIVER_REDIS_PORT }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}" >> /home/ubuntu/driver-new-tech/.env
+          "echo EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/ubuntu/driver-new-tech/.env
+          # echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           # chmod 600 private_key.pem
           # ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << 'EOF'
           # cd ~/driver/driver-new-tech
