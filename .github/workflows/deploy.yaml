@@ -98,7 +98,7 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
             # Change to project directory and pull the latest image from ECR
-            cd /home/ubuntu
+            cd /home/ubuntu/driver-new-tech/
             pwd
             ls -al
             # Ensure Docker Compose is available
@@ -118,3 +118,12 @@ jobs:
         run: |
           # Clean up any sensitive data or files that were created
           rm -f private_key.pem
+          
+      - name: Remove IP from Security Group
+        run: |
+          # Set the variables
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          IP_ADDRESS="${{ secrets.IP_ADDRESS }}/32"  # /32 denotes a single IP address
+          echo "Removing IP $IP_ADDRESS from Security Group $SECURITY_GROUP_ID"
+          # Revoke the security group ingress rule for the IP
+          aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
