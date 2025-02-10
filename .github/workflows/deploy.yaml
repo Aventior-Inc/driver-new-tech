@@ -46,15 +46,14 @@ jobs:
           chmod +x production_host.sh
           # Run the production_host.sh script
           ./production_host.sh
+           # Build the Docker image
+          docker-compose -f docker-compose.yml build
 
       - name: Build Docker image and Push to ECR
         run: |
           # Log in to ECR
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
           
-          # Build the Docker image
-          docker-compose -f /home/ubuntu/driver-new-tech/docker-compose.yml build
-
           # Tag the image for ECR
           docker tag driver-tech:latest ${{ secrets.ECR_REPO }}:latest
 
@@ -71,7 +70,7 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
             # Change to project directory and pull the latest image from ECR
-            cd /home/ubuntu/driver-new-tech
+            cd /home/ubuntu/
             
             # Ensure Docker Compose is available
             sudo apt-get install -y docker-compose
