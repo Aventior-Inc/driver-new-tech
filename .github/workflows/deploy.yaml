@@ -81,13 +81,22 @@ jobs:
           SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
           IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
           aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
+
+      - name: Copy files from Ubuntu Runner to EC2
+        run: |
+          # Copy files from GitHub Actions runner to EC2 instance
+          pwd
+          ls -al
+          scp -o StrictHostKeyChecking=no -i /tmp/private_key.pem -r driver-new-tech/* ubuntu@${{ secrets.HOST_NAME }}:/opt/driver-new-tech/
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
       - name: Deploy on EC2 with Docker Compose
         run: |
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
             # Change to project directory and pull the latest image from ECR
-            cd /home/ubuntu/
+            cd /opt
             
             # Ensure Docker Compose is available
             sudo apt-get install -y docker-compose
