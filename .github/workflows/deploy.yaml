@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create folder if it doesn't exist
-        run: |
-          mkdir -p /home/ubuntu/driver
+      # - name: Create folder if it doesn't exist
+      #   run: |
+      #     mkdir -p /home/ubuntu/driver
           
       - uses: actions/checkout@v4
         with:
