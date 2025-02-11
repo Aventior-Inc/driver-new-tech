@@ -88,7 +88,7 @@ jobs:
           chmod 600 private_key.pem
           pwd
           ls -al
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/driver-new-tech/
           rm private_key.pem
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
