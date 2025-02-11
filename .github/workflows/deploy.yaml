@@ -63,8 +63,8 @@ jobs:
           docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
           docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
-          # echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
-          # echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: SSH into EC2 and Deploy with Docker Compose
         uses: webfactory/ssh-agent@v0.5.3
@@ -103,9 +103,11 @@ jobs:
           cd /home/ubuntu/driver-new-tech/
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           pwd
+          echo "ran pwd"
           ls -al
           export DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
           export DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
+          echo "ran export"
           echo $DJANGO_IMAGE_TAG
           echo $DATABASE_IMAGE_TAG
           sudo apt-get install -y docker-compose
