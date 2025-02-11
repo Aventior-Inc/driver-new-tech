@@ -139,6 +139,9 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
+            sudo usermod -aG docker ubuntu
+            newgrp docker
+
             # Ensure AWS CLI is installed
             if ! command -v aws &> /dev/null; then
               echo "AWS CLI not found, installing..."
@@ -149,23 +152,16 @@ jobs:
               sudo ./aws/install
             fi
 
-            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            aws configure set region $AWS_REGION
-            aws s3 ls
-
             # Log in to ECR
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set region $AWS_REGION
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 432351613919.dkr.ecr.us-east-1.amazonaws.com
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
             # Pull the latest Docker image from ECR
             docker-compose pull
 
-            # Restart the containers using docker-compose (this will pull the latest images)
-            docker pull 432351613919.dkr.ecr.us-east-1.amazonaws.com/driver-tech:$DJANGO_IMAGE_TAG
-            docker pull 432351613919.dkr.ecr.us-east-1.amazonaws.com/driver-tech:$DATABASE_IMAGE_TAG
+            # Restart the containers using docker-compose (this will pull the latest images
             docker-compose up -d
 
             # Clean up any stopped containers
