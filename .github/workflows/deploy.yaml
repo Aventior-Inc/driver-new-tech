@@ -24,31 +24,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Create .env file for the Docker container
-        run: |
-          pwd
-          ls -al
-          echo "HOST_NAME=${{ secrets.HOST_NAME }}" > .env
-          echo "HOST_URL=${{ secrets.HOST_URL }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> .env
-          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> .env
-          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> .env
-          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> .env
-          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env
-          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> .env
-          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> .env
-          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
-          ls -al
-          # Give execute permission to production_host.sh
-          chmod +x production_host.sh
-          # Run the production_host.sh script
-          ./production_host.sh
-           # Build the Docker image
-          docker-compose -f docker-compose.yml build
-          docker image ls
+      # - name: Create .env file for the Docker container
+      #   run: |
+      #     pwd
+      #     ls -al
+      #     echo "HOST_NAME=${{ secrets.HOST_NAME }}" > .env
+      #     echo "HOST_URL=${{ secrets.HOST_URL }}" >> .env
+      #     echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+      #     echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> .env
+      #     echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> .env
+      #     echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> .env
+      #     echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> .env
+      #     echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env
+      #     echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> .env
+      #     echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> .env
+      #     echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
+      #     echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+      #     echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
+      #     ls -al
+      #     # Give execute permission to production_host.sh
+      #     chmod +x production_host.sh
+      #     # Run the production_host.sh script
+      #     ./production_host.sh
+      #      # Build the Docker image
+      #     docker-compose -f docker-compose.yml build
+      #     docker image ls
 
       - name: Build Docker image and Push to ECR
         run: |
@@ -56,18 +56,22 @@ jobs:
           # echo "aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           # echo "aws-region: ${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
           # Log in to ECR
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          # aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
           
-          # Tag the image for ECR
-          docker tag driver-django:latest ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
-          docker tag driver-database:latest  ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
+          # # Tag the image for ECR
+          # docker tag driver-django:latest ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          # docker tag driver-database:latest  ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
-          # Push the image to ECR
-          docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
-          docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
+          # # Push the image to ECR
+          # docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          # docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION="${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "ECR_REPO_URI="${{ secrets.ECR_REPO }}" >> $GITHUB_ENV
 
       - name: SSH into EC2 and Deploy with Docker Compose
         uses: webfactory/ssh-agent@v0.5.3
@@ -107,6 +111,8 @@ jobs:
           export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
           export AWS_REGION="${{ secrets.AWS_REGION }}"
           export ECR_REPO_URI="${{ secrets.ECR_REPO }}"
+          echo $ECR_REPO_URI
+          echo $AWS_REGION
           cd /home/ubuntu/driver-new-tech/
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           pwd
@@ -130,7 +136,7 @@ jobs:
               sudo ./aws/install
               aws --version
             fi
-             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
             sudo docker-compose pull $DJANGO_IMAGE_TAG $DATABASE_IMAGE_TAG
 
             # Start or restart the Docker containers using docker-compose
