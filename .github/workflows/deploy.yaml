@@ -104,43 +104,48 @@ jobs:
           echo "ECR_REPO_URI="${{ secrets.ECR_REPO }}" >> $GITHUB_ENV
 
       - name: Deploy on EC2 with Docker Compose
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ secrets.ECR_REPO_URI }} 
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.HOST_NAME }}
-          docker pull $REGISTRY/$REPOSITORY
-          
+          # Save the SSH private key to a file for later use
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
           # SSH into EC2 and deploy using Docker Compose
-          # ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
-          export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
-          export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          export AWS_REGION="${{ secrets.AWS_REGION }}"
-          
-          cd /home/ubuntu/driver-new-tech/
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-          echo $DJANGO_IMAGE_TAG
-          echo $DATABASE_IMAGE_TAG
-          
-          if ! command -v docker-compose &> /dev/null; then
-          sudo apt-get install -y docker-compose
-          fi
-          
-            # Pull the latest Docker image from ECR
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << EOF
+            # Export AWS credentials for ECR login
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+
+            # Navigate to the project directory
+            cd /home/ubuntu/driver-new-tech/
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
+            echo "Django Image Tag: $DJANGO_IMAGE_TAG"
+            echo "Database Image Tag: $DATABASE_IMAGE_TAG"
+
+            # Ensure Docker Compose is installed
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Docker Compose not found, installing..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            # Ensure AWS CLI is installed
             if ! command -v aws &> /dev/null; then
               echo "AWS CLI not found, installing..."
-              # Update and install dependencies
               sudo apt-get update -y
               sudo apt-get install -y unzip curl
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip awscliv2.zip
               sudo ./aws/install
-              aws --version
             fi
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
-            sudo docker-compose pull $DJANGO_IMAGE_TAG $DATABASE_IMAGE_TAG
 
-            # Start or restart the Docker containers using docker-compose
+            # Log in to ECR
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+
+            # Pull the latest Docker image from ECR
+            sudo docker-compose pull
+
+            # Restart the containers using docker-compose (this will pull the latest images)
             sudo docker-compose up -d
 
             # Clean up any stopped containers
