@@ -100,22 +100,26 @@ jobs:
         run: |
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
-            # Change to project directory and pull the latest image from ECR
-            cd /home/ubuntu/driver-new-tech/
-            sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-            pwd
-            ls -al
-            DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
-            DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
-            echo $DJANGO_IMAGE_TAG
-            echo $DATABASE_IMAGE_TAG
-            sudo apt-get install -y docker-compose
+          cd /home/ubuntu/driver-new-tech/
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
+          pwd
+          ls -al
+          export DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
+          export DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
+          echo $DJANGO_IMAGE_TAG
+          echo $DATABASE_IMAGE_TAG
+          sudo apt-get install -y docker-compose
 
             # Pull the latest Docker image from ECR
             if ! command -v aws &> /dev/null; then
               echo "AWS CLI not found, installing..."
+              # Update and install dependencies
               sudo apt-get update -y
-              sudo apt-get install -y awscli
+              sudo apt-get install -y unzip curl
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+              aws --version
             fi
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
             sudo docker-compose pull $DJANGO_IMAGE_TAG $DATABASE_IMAGE_TAG
