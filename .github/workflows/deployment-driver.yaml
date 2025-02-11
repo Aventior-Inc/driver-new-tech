@@ -1,0 +1,192 @@
+name: Deploy to EC2 and Push to ECR
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: Aventior-Inc/driver-new-tech
+          ref: staging
+
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Create .env file for the Docker container
+        run: |
+          pwd
+          ls -al
+          echo "HOST_NAME=${{ secrets.HOST_NAME }}" > .env
+          echo "HOST_URL=${{ secrets.HOST_URL }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> .env
+          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> .env
+          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> .env
+          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> .env
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env
+          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> .env
+          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> .env
+          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
+          echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
+          echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
+          echo "ECR_REPO=${{ secrets.ECR_REPO }}" >> .env
+          ls -al
+          # Give execute permission to production_host.sh
+          chmod +x production_host.sh
+          # Run the production_host.sh script
+          ./production_host.sh
+           # Build the Docker image
+          docker-compose -f docker-compose.yml build
+
+      - name: Build Docker image and Push to ECR
+        run: |
+          # Log in to ECR
+          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO }}" | cut -d '/' -f1)
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+          # Push the image to ECR
+          docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
+
+          echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: SSH into EC2 and Deploy with Docker Compose
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Get public IP of GitHub Actions Runner
+        id: get_ip
+        run: |
+          # Fetch the public IP address of the GitHub Actions runner using a public service
+          IP_ADDRESS=$(curl -s https://ifconfig.me)
+          echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
+          echo "GitHub Actions Runner IP: $IP_ADDRESS"
+          
+      - name: whitelisting ip on security group
+        run: |
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
+          aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
+
+      - name: Copy files from Ubuntu Runner to EC2
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          pwd
+          ls -al
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME }}:/home/ubuntu/driver-new-tech/
+          rm private_key.pem
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Exporting creds
+        run: |
+          echo "AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION="${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "ECR_REPO="${{ secrets.ECR_REPO }}" >> $GITHUB_ENV
+
+      - name: Deploy on EC2 with Docker Compose
+        run: |
+          # Save the SSH private key to a file for later use
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          # SSH into EC2 and deploy using Docker Compose
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME }} << EOF
+          echo "export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.bash_profile
+          echo "export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.bash_profile
+          echo "export AWS_REGION=${{ secrets.AWS_REGION }}" >> ~/.bash_profile
+
+          # Reload the profile to make the changes effective
+          source ~/.bash_profile
+
+          # Check if AWS CLI is working with the credentials set permanently
+          aws sts get-caller-identity
+          
+          # Navigate to the project directory
+          cd /home/ubuntu/driver-new-tech/
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
+          echo "Django Image Tag: $DJANGO_IMAGE_TAG"
+          echo "Database Image Tag: $DATABASE_IMAGE_TAG"
+
+            # Ensure Docker Compose is installed
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Docker Compose not found, installing..."
+              sudo apt-get update -y && \
+              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common && \
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
+              echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+              sudo apt-get update -y && \
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io
+              sudo curl -L https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            sudo usermod -aG docker ubuntu
+            newgrp docker
+
+            # Ensure AWS CLI is installed
+            if ! command -v aws &> /dev/null; then
+              echo "AWS CLI not found, installing..."
+              sudo apt-get update -y
+              sudo apt-get install -y unzip curl
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+            fi
+
+            # Log in to ECR
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set region $AWS_REGION
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+
+            # Pull the latest Docker image from ECR
+            docker compose pull
+
+            # Restart the containers using docker-compose (this will pull the latest images
+            sudo docker compose up -d
+            
+            # Clean up any stopped containers
+            docker image prune -a -f
+            ## sudo docker container prune -f
+          EOF
+        env: 
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+
+      - name: Cleanup
+        run: |
+          # Clean up any sensitive data or files that were created
+          rm -f private_key.pem
+
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Remove IP from Security Group
+        run: |
+          # Set the variables
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          IP_ADDRESS="${{ env.IP_ADDRESS }}/32" 
+          aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
