@@ -105,15 +105,19 @@ jobs:
         
       - name: Deploy on EC2 with Docker Compose
         run: |
+          ECR_REPO_URI=${{ secrets.ECR_REPO_URI }} 
+          
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
+          export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+          export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          export AWS_REGION="${{ secrets.AWS_REGION }}"
+          
           cd /home/ubuntu/driver-new-tech/
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-          ls -al
-          # export DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
-          # export DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
           echo $DJANGO_IMAGE_TAG
           echo $DATABASE_IMAGE_TAG
+          
           if ! command -v docker-compose &> /dev/null; then
           sudo apt-get install -y docker-compose
           fi
