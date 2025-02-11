@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Docker image and Push to ECR
         run: |
-          Log in to ECR
+          # Log in to ECR
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
           
           # Tag the image for ECR
