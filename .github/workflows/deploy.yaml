@@ -65,10 +65,7 @@ jobs:
 
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_REGION="${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-          echo "ECR_REPO_URI="${{ secrets.ECR_REPO }}" >> $GITHUB_ENV
+      
 
       - name: SSH into EC2 and Deploy with Docker Compose
         uses: webfactory/ssh-agent@v0.5.3
@@ -99,6 +96,13 @@ jobs:
           rm private_key.pem
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Exporting creds
+        run: |
+          echo "AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION="${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "ECR_REPO_URI="${{ secrets.ECR_REPO }}" >> $GITHUB_ENV
         
       - name: Deploy on EC2 with Docker Compose
         run: |
