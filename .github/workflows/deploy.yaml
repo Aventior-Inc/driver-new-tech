@@ -65,7 +65,6 @@ jobs:
 
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
-      
 
       - name: SSH into EC2 and Deploy with Docker Compose
         uses: webfactory/ssh-agent@v0.5.3
@@ -79,7 +78,7 @@ jobs:
           IP_ADDRESS=$(curl -s https://ifconfig.me)
           echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
           echo "GitHub Actions Runner IP: $IP_ADDRESS"
-
+          
       - name: whitelisting ip on security group
         run: |
           SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
@@ -108,24 +107,17 @@ jobs:
         run: |
           # SSH into EC2 and deploy using Docker Compose
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
-          export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
-          export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          export AWS_REGION="${{ secrets.AWS_REGION }}"
-          export ECR_REPO_URI="${{ secrets.ECR_REPO }}"
-          echo $ECR_REPO_URI
-          echo $AWS_REGION
           cd /home/ubuntu/driver-new-tech/
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-          pwd
-          echo "ran pwd"
           ls -al
-          export DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
-          export DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
-          echo "ran export"
+          # export DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}
+          # export DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}
           echo $DJANGO_IMAGE_TAG
           echo $DATABASE_IMAGE_TAG
+          if ! command -v docker-compose &> /dev/null; then
           sudo apt-get install -y docker-compose
-
+          fi
+          
             # Pull the latest Docker image from ECR
             if ! command -v aws &> /dev/null; then
               echo "AWS CLI not found, installing..."
