@@ -43,7 +43,7 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
-          echo "ECR_REPO="${{ secrets.ECR_REPO }}" >> .env
+          echo "ECR_REPO=${{ secrets.ECR_REPO }}" >> .env
           ls -al
           # Give execute permission to production_host.sh
           chmod +x production_host.sh
