@@ -162,7 +162,7 @@ jobs:
             docker-compose pull
 
             # Restart the containers using docker-compose (this will pull the latest images
-            sudo docker-compose up -d
+            sudo docker-compose up -d build
 
             # Clean up any stopped containers
             sudo docker container prune -f
@@ -174,10 +174,17 @@ jobs:
         run: |
           # Clean up any sensitive data or files that were created
           rm -f private_key.pem
+
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
           
       - name: Remove IP from Security Group
         run: |
           # Set the variables
           SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
           IP_ADDRESS="${{ env.IP_ADDRESS }}/32" 
-          aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS --region ${{ secrets.AWS_REGION }}
+          aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
