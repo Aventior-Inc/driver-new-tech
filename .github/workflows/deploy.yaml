@@ -56,7 +56,9 @@ jobs:
       - name: Build Docker image and Push to ECR
         run: |
           # Log in to ECR
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO }}" | cut -d '/' -f1)
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
           
           # # # Tag the image for ECR
           # docker tag driver-tech:driver-django-${{ github.run_number }} ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
