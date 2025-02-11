@@ -99,13 +99,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_NAME }} << EOF
             # Change to project directory and pull the latest image from ECR
             cd /home/ubuntu/driver-new-tech/
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
             pwd
             ls -al
             # Ensure Docker Compose is available
             sudo apt-get install -y docker-compose
 
             # Pull the latest Docker image from ECR
-            docker-compose pull
+            sudo docker-compose pull
 
             # Start or restart the Docker containers using docker-compose
             sudo docker-compose up -d
