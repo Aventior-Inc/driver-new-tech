@@ -149,7 +149,7 @@ jobs:
             aws s3 ls
 
             # Log in to ECR
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 432351613919.dkr.ecr.us-east-1.amazonaws.com
             if [ $? -ne 0 ]; then
             echo "Docker login failed"
             exit 1
