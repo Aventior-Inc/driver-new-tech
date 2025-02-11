@@ -166,7 +166,7 @@ jobs:
             sudo docker container prune -f
           EOF
         env: 
-          ECR_REPO_URI: ${{ secrets.ECR_REPO_URI }}
+          ECR_REPO_URI: ${{ secrets.ECR_REPO }}
 
       - name: Cleanup
         run: |
