@@ -165,6 +165,8 @@ jobs:
             # Clean up any stopped containers
             sudo docker container prune -f
           EOF
+        env: 
+          ECR_REPO_URI: ${{ secrets.ECR_REPO_URI }}
 
       - name: Cleanup
         run: |
