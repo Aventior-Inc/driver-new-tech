@@ -123,6 +123,7 @@ jobs:
           
           # Navigate to the project directory
           cd /home/ubuntu/driver-new-tech/
+          ./configure.sh
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
