@@ -159,12 +159,12 @@ jobs:
             aws configure set region $AWS_REGION
             sudo sleep 10
             echo "=============================setting up the docker creds================================"
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-            sudo aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-
+            ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO }}" | cut -d '/' -f1)
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
+            #aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+            
             # Pull the latest Docker image from ECR
             docker compose pull
-
             # Restart the containers using docker-compose (this will pull the latest images
             sudo docker compose up -d
             sudo sleep 10
