@@ -122,8 +122,11 @@ jobs:
           aws sts get-caller-identity
           
           # Navigate to the project directory
+          ls
+          sudo ./configure.sh
           cd /home/ubuntu/driver-new-tech/
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
+          ls
           sudo ./configure.sh
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
