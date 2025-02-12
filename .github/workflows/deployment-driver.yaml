@@ -122,11 +122,7 @@ jobs:
           aws sts get-caller-identity
           
           # Navigate to the project directory
-          ls
-          sudo bash configure.sh
           cd /home/ubuntu/driver-new-tech/
-          ls
-          sudo bash configure.sh
           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
@@ -168,7 +164,8 @@ jobs:
 
             # Restart the containers using docker-compose (this will pull the latest images
             sudo docker compose up -d
-            
+            sudo sleep 10
+            sudo bash configure.sh
             # Clean up any stopped containers
             docker image prune -a -f
             ## sudo docker container prune -f
