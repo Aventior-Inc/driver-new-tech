@@ -158,8 +158,9 @@ jobs:
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set region $AWS_REGION
             sudo sleep 10
-            ech0 "=============================setting up the docker creds================================"
+            echo "=============================setting up the docker creds================================"
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+            sudo aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
             # Pull the latest Docker image from ECR
             docker compose pull
