@@ -105,7 +105,6 @@ jobs:
           
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/export_creds.sh"
-          chmod -R 755 /home/ubuntu/driver-new-tech
           rm private_key.pem
           
         env:
@@ -127,6 +126,9 @@ jobs:
 
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
+           sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
+           chmod -R 755 /home/ubuntu/driver-new-tech
+
           # echo "export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.bash_profile
           # echo "export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.bash_profile
           # echo "export AWS_REGION=${{ secrets.AWS_REGION }}" >> ~/.bash_profile
@@ -139,7 +141,6 @@ jobs:
           
           # Navigate to the project directory
           cd /home/ubuntu/driver-new-tech/
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
 
