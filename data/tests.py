@@ -51,7 +51,7 @@ class ViewTestSetUpMixin(object):
         self.public_client.force_authenticate(user=self.public)
 
     def set_up_records(self):
-        self.now = datetime.now(pytz.timezone('Asia/Manila'))
+        self.now = datetime.now(pytz.timezone('Pacific/Samoa'))
         self.then = self.now - timedelta(days=10)
         self.beforeThen = self.then - timedelta(days=1)
         self.afterThen = self.then + timedelta(days=1)
@@ -228,7 +228,7 @@ class DriverRecordViewTestCase(APITestCase, ViewTestSetUpMixin):
                 u"Numb\xe9r": 1,
             },
         }
-        date = datetime(2016, 1, 29, 13, 0, 0, 0, pytz.timezone('Asia/Manila'))
+        date = datetime(2016, 1, 29, 13, 0, 0, 0, pytz.timezone('Pacific/Samoa'))
         test_record = DriverRecord.objects.create(
             occurred_from=date,
             occurred_to=date,
@@ -335,8 +335,8 @@ class DriverCustomReportViewTestCase(APITestCase, ViewTestSetUpMixin):
         self.url = ('/api/records/crosstabs/?archived=False&occurred_max={max}&occurred_min={min}' +
                     '&record_type={record_type}')
 
-        self.date1 = datetime(2015, 12, 12, 2, 0, 0, 0, pytz.timezone('Asia/Manila'))
-        self.date2 = datetime(2016, 2, 29, 13, 0, 0, 0, pytz.timezone('Asia/Manila'))
+        self.date1 = datetime(2015, 12, 12, 2, 0, 0, 0, pytz.timezone('Pacific/Samoa'))
+        self.date2 = datetime(2016, 2, 29, 13, 0, 0, 0, pytz.timezone('Pacific/Samoa'))
         data = {
             'objectDetails': {
                 'Itness': 'It',
@@ -476,7 +476,7 @@ class DriverRecordAuditLogViewSetTestCase(APITestCase, ViewTestSetUpMixin):
         super(DriverRecordAuditLogViewSetTestCase, self).setUp()
         self.set_up_admin_client()
 
-        self.now = datetime.now(pytz.timezone('Asia/Manila'))
+        self.now = datetime.now(pytz.timezone('Pacific/Samoa'))
         self.ten_days_ago = self.now - timedelta(days=10)
         self.ten_days_hence = self.now + timedelta(days=10)
 

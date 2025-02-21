@@ -81,7 +81,9 @@ class BindIncidentDetailFilterViewSet(APIView):
                     for element in element_list:
                         array['Type']['enum'].remove(element)
                         irap_instance = IrapDetail.objects.get(irap_treatment_id=element)
-                        irap_tratments_list.append(irap_instance.irap_treatment_name)
+                        irap_obj_dict = {"name": irap_instance.irap_treatment_name,
+                                         "description": irap_instance.irap_treatment_description}
+                        irap_tratments_list.append(irap_obj_dict)
                     for irap_tratments in irap_tratments_list:
                         array['Type']['enum'].insert(i, irap_tratments)
                         i += 1

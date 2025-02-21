@@ -49,7 +49,7 @@ def transform(record, schema_id):
 
     # Calculate value for the occurred_from/to fields in local time
     occurred_date = parser.parse(record['record_date'])
-    occurred_date = pytz.timezone('Asia/Manila').localize(occurred_date)
+    occurred_date = pytz.timezone('Pacific/Samoa').localize(occurred_date)
     print ("occurred_date*****************************",occurred_date)
     # Set the geom field
     # Some of the files use lat/lon, others use 3123.

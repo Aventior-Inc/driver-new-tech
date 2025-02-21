@@ -49,7 +49,7 @@ RECORD_COL_SEVERE = os.getenv('RECORD_COL_SEVERE', 'Severity')
 RECORD_COL_SEVERE_VALS = os.getenv('RECORD_COL_SEVERE_VALS', 'Fatal,Injury')
 RECORD_COL_PRECIP = os.getenv('RECORD_COL_PRECIP', 'weather')
 RECORD_COL_PRECIP_VALS = os.getenv('RECORD_COL_PRECIP_VALS',
-                                   'rain,hail,sleet,snow,thunderstorm,tornado')
+                                   'rain,hail,sleet,thunderstorm,tornado')
 COMBINED_SEGMENTS_SHP_NAME = os.getenv('COMBINED_SEGMENTS_SHP_NAME', 'combined_segments.shp')
 TILE_MAX_UNITS = int(os.getenv('TILE_MAX_UNITS', '3000'))
 

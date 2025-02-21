@@ -8,7 +8,6 @@ import operator
 import os
 import uuid
 from functools import reduce
-
 import pandas as pd
 from collections import defaultdict
 from datetime import timedelta
@@ -38,6 +37,7 @@ from django.db.models.functions import Coalesce
 from django.http import Http404
 from django.template.defaultfilters import date as template_date
 from django_redis import get_redis_connection
+from DRIVER.settings import STATIC_ROOT
 from grout.models import RecordSchema, RecordType, BoundaryPolygon, Boundary, Record
 from grout.pagination import OptionalLimitOffsetPagination
 from grout.serializers import (BoundarySerializer,
@@ -87,6 +87,8 @@ from rest_framework.filters import SearchFilter
 
 # DateTimeField.register_lookup(transformers.ISOYearTransform)
 # DateTimeField.register_lookup(transformers.WeekTransform)
+from driver_advanced_auth.reports.incident_pdf_report import generate_pdf
+import shutil
 
 xrange = range
 
@@ -1514,6 +1516,7 @@ class RecordCsvExportViewSet(viewsets.ViewSet):
         # real task; it will simply return a task with a status of 'PENDING' that will never
         # complete.
         job_result = export_csv.AsyncResult(pk)
+        # job_result = export_csv(pk)
         if job_result.state in states.READY_STATES:
             if job_result.state in states.EXCEPTION_STATES:
                 e = job_result.get(propagate=False)
@@ -3845,3 +3848,39 @@ class KeyDetailsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return KeyDetail.objects.all()
+
+
+
+class DriverRecordReportView(APIView):
+    def post(self, request):
+
+        record_uuid_list = request.data.get("record_id")
+
+        if len(record_uuid_list) > 1:
+            incident_report_dir = os.path.join(STATIC_ROOT, f"media/{datetime.datetime.now().strftime("%d-%b-%Y_T%H:%M:%S")}")
+            os.makedirs(incident_report_dir, exist_ok=True)
+            final_file_name = f"{incident_report_dir}.zip"
+
+            for record_uuid in record_uuid_list:
+                driver_record_details = DriverRecord.objects.filter(uuid=record_uuid)
+                if not driver_record_details.exists():
+                    return Response({"detail": "No records found for the given UUID(s)."}, status=status.HTTP_404_NOT_FOUND)
+                serialized_data = DriverRecordSerializer(driver_record_details, many=True).data
+                file_path = os.path.join(STATIC_ROOT, f"media/{record_uuid}"".pdf")
+                generate_pdf(file_path, serialized_data[0])
+                shutil.copy(file_path, incident_report_dir)
+
+            shutil.make_archive(incident_report_dir, 'zip', incident_report_dir)
+
+
+        else:
+            record_uuid = record_uuid_list[0]
+            driver_record_details = DriverRecord.objects.filter(uuid=record_uuid)
+            if not driver_record_details.exists():
+                return Response({"detail": "No records found for the given UUID(s)."}, status=status.HTTP_404_NOT_FOUND)
+            serialized_data = DriverRecordSerializer(driver_record_details, many=True).data
+            file_path = os.path.join(STATIC_ROOT, f"media/{record_uuid}"".pdf")
+            final_file_name = generate_pdf(file_path, serialized_data[0])
+
+        downloadable_path = settings.HOST_URL + "/download/" + os.path.basename(final_file_name)
+        return Response({"file_path": downloadable_path}, status=status.HTTP_200_OK)

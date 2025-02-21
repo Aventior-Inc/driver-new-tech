@@ -54,10 +54,10 @@ def transform(record, schema_id, required_fields):
 
     # Calculate value for the occurred_from/to fields in local time
     occurred_from_date = parser.parse(record['occurred_from'])
-    occurred_from_date = pytz.timezone('Asia/Manila').localize(occurred_from_date)
+    occurred_from_date = pytz.timezone('Pacific/Samoa').localize(occurred_from_date)
 
     occurred_to_date = parser.parse(record['occurred_to'])
-    occurred_to_date = pytz.timezone('Asia/Manila').localize(occurred_to_date)
+    occurred_to_date = pytz.timezone('Pacific/Samoa').localize(occurred_to_date)
     location_text = record['location_text']
 
     # Set the geom field

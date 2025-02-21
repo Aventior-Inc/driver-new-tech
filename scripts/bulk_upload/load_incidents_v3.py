@@ -50,7 +50,7 @@ def transform(record, schema_id):
 
     # Calculate value for the occurred_from/to fields in local time
     occurred_date = parser.parse(record['record_date'])
-    occurred_date = pytz.timezone('Asia/Manila').localize(occurred_date)
+    occurred_date = pytz.timezone('Pacific/Samoa').localize(occurred_date)
     print ("occurred_date*****************************",occurred_date)
     # Set the geom field
     # Some of the files use lat/lon, others use 3123.
@@ -127,7 +127,7 @@ def create_schema(schema_path, api, headers=None):
             if i['label'] == "Incident":
                 rectype_id = i['uuid']
 
-        # rectype_id = results[0]['uuid']
+        rectype_id = results[0]['uuid']
         logger.info('Loaded RecordType')
     except IndexError:
         response = requests.post(api + '/recordtypes/',
@@ -141,43 +141,44 @@ def create_schema(schema_path, api, headers=None):
         rectype_id = response.json()['uuid']
         logger.info('Created RecordType')
     # Create associated schema
-    with open(schema_path, 'r') as schema_file:
-        schema_json = json.load(schema_file)
-        # import ipdb;ipdb.set_trace()
-        new_headers = {'content-type': 'application/json'}
-        new_headers.update(headers)
-        response = requests.post(api + '/recordschemas/',
-                                 data=json.dumps({u'record_type': rectype_id,
-                                                  u'schema': schema_json}),
-                                 # headers=dict({'content-type': 'application/json'}.items() +
-                                 #              headers.items()))
-                                headers = new_headers)
-    logger.debug(response.json())
-    response.raise_for_status()
-    logger.info('Created RecordSchema')
-    return response.json()['uuid']
+    # with open(schema_path, 'r') as schema_file:
+    #     schema_json = json.load(schema_file)
+    #     # import ipdb;ipdb.set_trace()
+    #     new_headers = {'content-type': 'application/json'}
+    #     new_headers.update(headers)
+    #     response = requests.post(api + '/recordschemas/',
+    #                              data=json.dumps({u'record_type': rectype_id,
+    #                                               u'schema': schema_json}),
+    #                              # headers=dict({'content-type': 'application/json'}.items() +
+    #                              #              headers.items()))
+    #                             headers = new_headers)
+    # logger.debug(response.json())
+    # response.raise_for_status()
+    # logger.info('Created RecordSchema')
+    return rectype_id
 
 
-# def main(**args_dict):
-    # parser = argparse.ArgumentParser(description='Load incidents data (v3)')
-    # parser.add_argument('incidents_csv_dir', help='Path to directory containing incidents CSVs')
-    # parser.add_argument('--schema-path', help='Path to JSON file defining schema',
-    #                     default=os.path.join(os.path.dirname(os.path.realpath(__file__)),
-    #                                          'incident_schema_v3.json'))
-    # parser.add_argument('--api-url', help='API host / path to target for loading data',
-    #                     default='http://13.52.193.94/:8000/api')
-    # parser.add_argument('--authz', help='Authorization header')
-    # args = parser.parse_args()
+def main(**args_dict):
+    parser = argparse.ArgumentParser(description='Load incidents data (v3)')
+    parser.add_argument('incidents_csv_dir', help='Path to directory containing incidents CSVs')
+    parser.add_argument('--schema-path', help='Path to JSON file defining schema',
+                        default=os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                             'incident_schema_v3.json'))
+    parser.add_argument('--api-url', help='API host / path to target for loading data',
+                        default='http://127.0.0.1:4000/api')
+    parser.add_argument('--authz', help='Authorization header',
+                        default='Token 36df3ade778ca4fcf66ba998506bdefa54fdff1c')
+    args = parser.parse_args()
 
-    # headers = None
-    #
-    # if args.authz:
-    #     headers = {'Authorization': args.authz}
+    headers = None
+
+    if args.authz:
+        headers = {'Authorization': args.authz}
 
     api_url = "http://" + os.path.join(args_dict["apiurl"], "api")
-    headers = args_dict["header"]
+    headers = args_dict["authz"]
     schema_path = os.path.join(os.getcwd(), "scripts", "incident_schema_v3.json")
-    # incidents_csv_dir = os.path.join("scripts", "sample_data")
+    incidents_csv_dir = os.path.join("scripts", "sample_data")
 
     # Do the work
     schema_id = create_schema(schema_path, api_url, headers)

@@ -20,11 +20,11 @@ click on **New SSH key** button **paste the copied key** inside **key** textarea
 Take clone from bitbucket using below command
 
     cd ~
-    git clone git@github.com:Aventior-Inc/driver-new-tech.git
+    git clone git@github.com:hsarbas/DRIVER2.0.git
 
-Run production.sh from driver-new-tech
+Run production.sh from driver_new_tech
 
-    cd driver-new-tech
+    cd driver_new_tech
     sudo bash production_host.sh
 
 **Environment**
@@ -34,11 +34,11 @@ values required to run DRIVER2.0.
 
 Create .env file in the project directory refer template .env.sample follow steps below:
 
-    cd /var/www/driver-new-tech/
+    cd /var/www/driver_new_tech/
     sudo nano .env
     save and close the file
 
-In the project directory(/var/www/driver-new-tech/) as a superuser, execute steps below:
+In the project directory(/var/www/driver_new_tech/) as a superuser, execute steps below:
 
     docker-compose up -d
 
@@ -51,7 +51,7 @@ Review the containers using below command
 
 Execute the configure.sh file using below commands.
 
-    cd /var/www/driver-new-tech/
+    cd /var/www/driver_new_tech/
     ./configure.sh
 
 Enter username,email,password for superuser.
