@@ -3,43 +3,6 @@
   "title": "",
   "plural_title": "",
   "definitions": {
-    "driverVideo": {
-      "type": "object",
-      "title": "Video",
-      "multiple": true,
-      "required": [
-        "_localId"
-      ],
-      "properties": {
-        "Video": {
-          "type": "string",
-          "media": {
-            "type": "video/mp4",
-            "binaryEncoding": "base64"
-          },
-          "fieldType": "video",
-          "isSearchable": false,
-          "propertyOrder": 0
-        },
-        "_localId": {
-          "type": "string",
-          "options": {
-            "hidden": true
-          },
-          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-        },
-        "Description": {
-          "type": "string",
-          "format": "text",
-          "fieldType": "text",
-          "isSearchable": true,
-          "propertyOrder": 1
-        }
-      },
-      "definitions": {},
-      "description": "Video Upload",
-      "plural_title": "Videos"
-    },
     "driverNotes": {
       "type": "object",
       "title": "Notes",
@@ -102,6 +65,43 @@
       "definitions": {},
       "description": "Pictures of the incident",
       "plural_title": "Photos"
+    },
+    "driverVideo": {
+      "type": "object",
+      "title": "Video",
+      "multiple": true,
+      "required": [
+        "_localId"
+      ],
+      "properties": {
+        "Video": {
+          "type": "string",
+          "media": {
+            "type": "video/mp4",
+            "binaryEncoding": "base64"
+          },
+          "fieldType": "video",
+          "isSearchable": false,
+          "propertyOrder": 0
+        },
+        "_localId": {
+          "type": "string",
+          "options": {
+            "hidden": true
+          },
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "Description": {
+          "type": "string",
+          "format": "text",
+          "fieldType": "text",
+          "isSearchable": true,
+          "propertyOrder": 1
+        }
+      },
+      "definitions": {},
+      "description": "Video Upload",
+      "plural_title": "Videos"
     },
     "driverPerson": {
       "type": "object",
@@ -172,9 +172,17 @@
           "propertyOrder": 4
         },
         "Hospital": {
+          "enum": [
+            "Tupua Tamasese Meaole Hospital Apia, Samoa",
+            "Malietoa Tanumafili II Hospital Tuasivi, Samoa",
+            "Poutasi District Hospital Poutasi, Samoa",
+            "Leulumoega District Hospital Leulumoega, Samoa",
+            "Sataua District Hospital Sataua, Samoa",
+            "Safotu District Hospital Safotu, Samoa"
+          ],
           "type": "string",
-          "format": "text",
-          "fieldType": "text",
+          "fieldType": "selectlist",
+          "displayType": "select",
           "isSearchable": true,
           "propertyOrder": 18
         },
@@ -196,7 +204,8 @@
           "enum": [
             "Worn",
             "Not worn",
-            "Not worn correctly"
+            "Not worn correctly",
+            "No seat belt"
           ],
           "type": "string",
           "fieldType": "selectlist",
@@ -246,7 +255,7 @@
             "Improper Lane Changes",
             "Aggressive/Reckless Driving",
             "Failure to Yield Right of Way",
-            "Violating Traffic Laws"
+            "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
@@ -254,34 +263,12 @@
           "isSearchable": false,
           "propertyOrder": 12
         },
-        "License Type": {
-          "enum": [
-            "Private",
-            "Commercial"
-          ],
-          "type": "string",
-          "fieldType": "selectlist",
-          "displayType": "select",
-          "isSearchable": false,
-          "propertyOrder": 8
-        },
         "Alcohol Level": {
           "type": "string",
           "format": "text",
           "fieldType": "text",
           "isSearchable": false,
           "propertyOrder": 15
-        },
-        "Alcohol/drugs": {
-          "enum": [
-            "Alcohol suspected",
-            "Drugs suspected"
-          ],
-          "type": "string",
-          "fieldType": "selectlist",
-          "displayType": "select",
-          "isSearchable": false,
-          "propertyOrder": 14
         },
         "License Number": {
           "type": "string",
@@ -326,35 +313,56 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
+          "propertyOrder": 20
+        },
+        "Assigned Doctor": {
+          "type": "string",
+          "format": "text",
+          "fieldType": "text",
+          "isSearchable": false,
           "propertyOrder": 19
         },
         "Passenger factor": {
           "enum": [
             "Onboarding",
             "Leaving",
-            "Occupying vehicle"
+            "Occupying vehicle",
+            "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 22
+          "propertyOrder": 23
+        },
+        "Alcohol Influence": {
+          "enum": [
+            "Suspected",
+            "Not Suspected"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 14
         },
         "Employment Status": {
           "enum": [
             "Employed",
-            "Unemployed"
+            "Unemployed",
+            "Self Employed",
+            "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 20
+          "propertyOrder": 21
         },
         "Island of License": {
           "enum": [
-            "UP",
-            "SV"
+            "Upolu",
+            "Savai'i"
           ],
           "type": "string",
           "fieldType": "selectlist",
@@ -371,7 +379,7 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 24
+          "propertyOrder": 25
         },
         "Type of Employment": {
           "enum": [
@@ -386,13 +394,14 @@
             "Construction Worker",
             "Banker",
             "Tour Guide",
-            "Hotel Staff"
+            "Hotel Staff",
+            "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 21
+          "propertyOrder": 22
         },
         "Passenger Onboarding": {
           "enum": [
@@ -403,45 +412,84 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 23
+          "propertyOrder": 24
+        },
+        "Driver's License Type": {
+          "enum": [
+            "Private",
+            "Commercial"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 8
         },
         "Passenger Occupying Vehicle": {
           "enum": [
             "By riding on side rails",
             "By standing in the bus entrance",
             "Overloaded",
+            "Pillion Rider",
             "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 25
+          "propertyOrder": 26
         },
-        "Medical condition impacting the ability to drive": {
+        "Medical Conditions Resulting from a Crash": {
           "enum": [
             "Heart conditions",
-            "Respiratory problems ",
-            "Muscular dystrophy ",
-            "Neurological disorders ",
-            "Mental health conditions ",
+            "Respiratory problems",
+            "Muscular dystrophy",
+            "Neurological disorders",
+            "Mental health conditions",
             "Hearing impairments",
-            "Balance or coordination issues ",
-            "Cognitive impairments ",
-            "Sleep disorders ",
-            "Substance abuse issues ",
+            "Balance or coordination issues",
+            "Cognitive impairments",
+            "Sleep disorders",
+            "Substance abuse issues",
             "Epilepsy",
             "Eyesight issues",
             "Amputations",
             "Convulsions",
             "High Blood pressure",
-            "Stroke"
+            "Stroke",
+            "Psychological Condition"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 26
+          "propertyOrder": 28
+        },
+        "Pre-Existing Medical Conditions Affecting Driving": {
+          "enum": [
+            "Heart conditions",
+            "Respiratory problems",
+            "Muscular dystrophy",
+            "Neurological disorders",
+            "Mental health conditions",
+            "Hearing impairments",
+            "Balance or coordination issues",
+            "Cognitive impairments ",
+            "Sleep disorders",
+            "Substance abuse issues",
+            "Epilepsy",
+            "Eyesight issues",
+            "Amputations",
+            "Convulsions",
+            "High Blood pressure",
+            "Stroke",
+            "Psychological Condition"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 27
         }
       },
       "definitions": {},
@@ -454,7 +502,7 @@
       "multiple": true,
       "required": [
         "_localId",
-        "Vehicle License Status"
+        "Vehicle Registration Status"
       ],
       "properties": {
         "Damage": {
@@ -465,25 +513,6 @@
             "Right",
             "Left",
             "Roof",
-            "Multiple"
-          ],
-          "type": "string",
-          "fieldType": "selectlist",
-          "displayType": "select",
-          "isSearchable": false,
-          "propertyOrder": 6
-        },
-        "Defect": {
-          "enum": [
-            "None",
-            "Lights",
-            "Brakes",
-            "Engine",
-            "Wipers",
-            "Gear",
-            "Horn",
-            "Steering",
-            "Tires",
             "Multiple"
           ],
           "type": "string",
@@ -503,7 +532,7 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 8
+          "propertyOrder": 9
         },
         "Surface": {
           "enum": [
@@ -519,7 +548,7 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 12
+          "propertyOrder": 13
         },
         "Maneuver": {
           "enum": [
@@ -541,7 +570,7 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 5
+          "propertyOrder": 6
         },
         "_localId": {
           "type": "string",
@@ -555,24 +584,29 @@
             "To East",
             "To West",
             "To North",
-            "To South"
-          ],
-          "type": "string",
-          "fieldType": "selectlist",
-          "displayType": "select",
-          "isSearchable": true,
-          "propertyOrder": 1
-        },
-        "Drive Type": {
-          "enum": [
-            "Right",
-            "Left"
+            "To South",
+            "North East",
+            "North West",
+            "South East",
+            "South West"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 14
+          "propertyOrder": 1
+        },
+        "Drive Type": {
+          "enum": [
+            "Right",
+            "Left",
+            "Middle"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 15
         },
         "License Type": {
           "enum": [
@@ -583,7 +617,7 @@
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 17
+          "propertyOrder": 18
         },
         "Plate number": {
           "type": "string",
@@ -596,10 +630,10 @@
           "enum": [
             "Car",
             "Van",
+            "Taxi",
             "SUV",
             "Bus",
             "Jeepney",
-            "Taxi (metered)",
             "Truck (Pick-Up)",
             "Truck (Rigid)",
             "Truck (Articulated)",
@@ -609,14 +643,7 @@
             "Armored Car",
             "Heavy Equipment",
             "Motorcycle",
-            "Tricycle",
-            "Bicycle",
-            "Pedicab",
-            "Pedestrian",
-            "Push-Cart",
-            "Animal",
-            "Water Vessel",
-            "Electric Bike",
+            "Electric Car",
             "Others"
           ],
           "type": "string",
@@ -630,14 +657,14 @@
           "format": "text",
           "fieldType": "text",
           "isSearchable": true,
-          "propertyOrder": 10
+          "propertyOrder": 11
         },
         "Chassis number": {
           "type": "string",
           "format": "text",
           "fieldType": "text",
           "isSearchable": true,
-          "propertyOrder": 11
+          "propertyOrder": 12
         },
         "Classification": {
           "enum": [
@@ -658,7 +685,7 @@
           "format": "text",
           "fieldType": "text",
           "isSearchable": false,
-          "propertyOrder": 16
+          "propertyOrder": 17
         },
         "Make and Model": {
           "enum": [
@@ -679,26 +706,49 @@
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
-          "isSearchable": true,
-          "propertyOrder": 4
+          "isSearchable": false,
+          "propertyOrder": 5
         },
-        "Insurance details": {
-          "type": "string",
-          "format": "text",
-          "fieldType": "text",
-          "isSearchable": true,
-          "propertyOrder": 9
-        },
-        "Island of License": {
+        "Vehicle Defect": {
           "enum": [
-            "UP",
-            "SV"
+            "None",
+            "Lights",
+            "Brakes",
+            "Engine",
+            "Wipers",
+            "Gear",
+            "Horn",
+            "Steering",
+            "Tires",
+            "Multiple"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 18
+          "propertyOrder": 8
+        },
+        "Insurance details": {
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 10
+        },
+        "Island of License": {
+          "enum": [
+            "Upolu",
+            "Savai'i"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 19
         },
         "Manufacturing Year": {
           "enum": [
@@ -726,18 +776,34 @@
             "2021",
             "2022",
             "2023",
-            "2024"
+            "2024",
+            "2025"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 13
+          "propertyOrder": 14
         },
-        "Vehicle License Status": {
+        "Non-Motorized Vehicle Type": {
           "enum": [
-            "Licensed",
-            "Unlicensed",
+            "Bicycle",
+            "Tricycle",
+            "Pedicab",
+            "Push-Cart",
+            "Horse-Drawn Carriage (Tartanilla)",
+            "Other"
+          ],
+          "type": "string",
+          "fieldType": "selectlist",
+          "displayType": "select",
+          "isSearchable": false,
+          "propertyOrder": 4
+        },
+        "Vehicle Registration Status": {
+          "enum": [
+            "Registered",
+            "Unregistered",
             "Expired",
             "Pending",
             "Suspended",
@@ -746,13 +812,13 @@
             "Restricted",
             "Under Review",
             "Renewed",
-            "Foreign "
+            "Foreign Registered"
           ],
           "type": "string",
           "fieldType": "selectlist",
           "displayType": "select",
           "isSearchable": false,
-          "propertyOrder": 15
+          "propertyOrder": 16
         }
       },
       "definitions": {},
@@ -825,17 +891,14 @@
       ],
       "properties": {
         "Severity": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "Fatal",
-              "Injury",
-              "Property Damage"
-            ]
-          },
+          "enum": [
+            "Fatal",
+            "Serious",
+            "Minor"
+          ],
+          "type": "string",
           "fieldType": "selectlist",
-          "displayType": "checkbox",
-          "uniqueItems": true,
+          "displayType": "select",
           "isSearchable": true,
           "propertyOrder": 0
         },
@@ -844,6 +907,7 @@
           "enum": [
             "Vehicle defect",
             "Road defect",
+            "Driver Error",
             "Other"
           ],
           "type": "string",
@@ -875,7 +939,8 @@
             "Roadside Debris",
             "Traffic Signal Malfunction",
             "Lane Closure Without Warning",
-            "Pedestrian Crossing Hazard"
+            "Pedestrian Crossing Hazard",
+            "Other"
           ],
           "type": "string",
           "fieldType": "selectlist",
@@ -943,18 +1008,6 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "driverVideo": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/driverVideo"
-      },
-      "title": "Video",
-      "options": {
-        "collapsed": true
-      },
-      "plural_title": "Videos",
-      "propertyOrder": 6
-    },
     "driverNotes": {
       "$ref": "#/definitions/driverNotes",
       "title": "Notes",
@@ -975,6 +1028,18 @@
       },
       "plural_title": "Photos",
       "propertyOrder": 4
+    },
+    "driverVideo": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/driverVideo"
+      },
+      "title": "Video",
+      "options": {
+        "collapsed": true
+      },
+      "plural_title": "Videos",
+      "propertyOrder": 6
     },
     "driverPerson": {
       "type": "array",
