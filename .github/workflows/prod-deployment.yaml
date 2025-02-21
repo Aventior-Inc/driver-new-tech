@@ -39,8 +39,8 @@ jobs:
           echo "STATIC_ROOT=${{ secrets.STATIC_ROOT_PROD }}" >> .env
           echo "DIST_ROOT=${{ secrets.DIST_ROOT_PROD }}" >> .env
           echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT_PROD }}" >> .env
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER_PROD }}" >> .env
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD_PROD }}" >> .env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
           echo "ECR_REPO=${{ secrets.ECR_REPO_PROD }}" >> .env
@@ -55,7 +55,7 @@ jobs:
       - name: Tagging of image and Push to ECR
         run: |
           # Log in to ECR
-          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO_PROD }}
           ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO_PROD }}" | cut -d '/' -f1)
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
 
