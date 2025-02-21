@@ -160,6 +160,7 @@ jobs:
             sudo usermod -aG docker ubuntu
             sudo chmod 666 /var/run/docker.sock
             newgrp docker
+            sudo systemctl restart docker && sudo systemctl enable docker
 
             # Ensure AWS CLI is installed
             if ! command -v aws &> /dev/null; then
