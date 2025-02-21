@@ -158,6 +158,7 @@ jobs:
             fi
 
             sudo usermod -aG docker ubuntu
+            sudo chmod 666 /var/run/docker.sock
             newgrp docker
 
             # Ensure AWS CLI is installed
