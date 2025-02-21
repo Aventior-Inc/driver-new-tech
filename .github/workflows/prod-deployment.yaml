@@ -91,7 +91,7 @@ jobs:
           
       - name: Whitelisting ip on security group
         run: |
-          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID_PROD }}"
           IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
           aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
 
@@ -204,6 +204,6 @@ jobs:
       - name: Remove IP from Security Group
         run: |
           # Set the variables
-          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID }}"
+          SECURITY_GROUP_ID="${{ secrets.SECURITY_GROUP_ID_PROD }}"
           IP_ADDRESS="${{ env.IP_ADDRESS }}/32" 
           aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $IP_ADDRESS
