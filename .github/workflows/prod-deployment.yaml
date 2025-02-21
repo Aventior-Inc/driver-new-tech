@@ -1,4 +1,4 @@
-name: Build, push to ECR & Deploy on Ec2
+name: Build, push to PROD ECR & Deploy on Ec2
 
 on:
   push:
