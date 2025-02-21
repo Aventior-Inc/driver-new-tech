@@ -105,7 +105,6 @@ jobs:
           
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/export_creds.sh"
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
           chmod -R 755 /home/ubuntu/driver-new-tech
           rm private_key.pem
           
