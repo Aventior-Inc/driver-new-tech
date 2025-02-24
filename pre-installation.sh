@@ -43,3 +43,7 @@ if ! command -v aws &> /dev/null; then
 fi
 
 sudo mkdir -p /var/www/driver-new-tech
+sudo chmod -R 755 /var/www/driver-new-tech/
+sudo chown -R ubuntu:ubuntu /var/www/***-new-tech/
+
+
