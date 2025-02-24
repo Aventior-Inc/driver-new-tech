@@ -108,14 +108,6 @@ jobs:
           rm private_key.pem
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # - name: Exporting creds
-      #   run: |
-      #     echo "AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-      #     echo "AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-      #     echo "AWS_REGION="${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-      #     echo "ECR_REPO="${{ secrets.ECR_REPO_PROD }}" >> $GITHUB_ENV
-
       
       - name: Pulling image and Deploy on EC2 with Docker Compose
         run: |
@@ -125,14 +117,6 @@ jobs:
 
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
-           # sudo chown -R ubuntu:ubuntu /home/ubuntu/driver-new-tech
-           # chmod -R 755 /home/ubuntu/driver-new-tech
-
-          # echo "export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.bash_profile
-          # echo "export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.bash_profile
-          # echo "export AWS_REGION=${{ secrets.AWS_REGION }}" >> ~/.bash_profile
-          # Reload the profile to make the changes effective
-          #source ~/.bash_profile
 
           # Check if AWS CLI is working with the credentials set permanently
           echo "=====================    Check if AWS CLI is working with the credentials  ================================ "
@@ -142,40 +126,6 @@ jobs:
           cd /home/ubuntu/driver-new-tech/
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
-
-            # # Ensure Docker Compose is installed
-            # if ! command -v docker-compose &> /dev/null; then
-            #   echo "Docker Compose not found, installing..."
-            #   sudo apt-get update -y && \
-            #   sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common && \
-            #   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
-            #   echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-            #   sudo apt-get update -y && \
-            #   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io
-            #   sudo curl -L https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-            #   sudo chmod +x /usr/local/bin/docker-compose
-            # fi
-
-            # sudo usermod -aG docker ubuntu
-            # sudo chmod 666 /var/run/docker.sock
-            # newgrp docker
-            # sudo systemctl restart docker && sudo systemctl enable docker
-
-            # # Ensure AWS CLI is installed
-            # if ! command -v aws &> /dev/null; then
-            #   echo "AWS CLI not found, installing..."
-            #   sudo apt-get update -y
-            #   sudo apt-get install -y unzip curl
-            #   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            #   unzip awscliv2.zip
-            #   sudo ./aws/install
-            # fi
-
-            # # Log in to ECR
-            # aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-            # aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            # aws configure set region $AWS_REGION
-            # sudo sleep 10
             
             #aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_PROD
             
@@ -185,7 +135,7 @@ jobs:
             # Restart the containers using docker-compose (this will pull the latest images
             sudo docker compose up -d
             sudo sleep 10
-            sudo bash /var/www/configure.sh
+            sudo bash configure.sh
             # Clean up any stopped containers
             docker image prune -a -f
             ## sudo docker container prune -f
