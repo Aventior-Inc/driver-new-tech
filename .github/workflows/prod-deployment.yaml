@@ -117,6 +117,10 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
 
+          cd /var/www/driver-new-tech
+          sudo chmod +x pre-installation.sh
+          sudo bash pre-installation.sh
+
           # Check if AWS CLI is working with the credentials set permanently
           echo "=====================    Check if AWS CLI is working with the credentials  ================================ "
           aws sts get-caller-identity
