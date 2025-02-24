@@ -43,7 +43,7 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
-          echo "ECR_REPO=${{ secrets.ECR_REPO_PROD }}" >> .env
+          echo "ECR_REPO=${{ secrets.ECR_REPO }}" >> .env
           ls -al
           # Give execute permission to production_host.sh
           chmod +x production_host.sh
@@ -55,13 +55,13 @@ jobs:
       - name: Tagging of image and Push to ECR
         run: |
           # Log in to ECR
-          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO_PROD }}
-          ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO_PROD }}" | cut -d '/' -f1)
+          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+          ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO }}" | cut -d '/' -f1)
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
 
           # Push the image to ECR
-          docker push ${{ secrets.ECR_REPO_PROD }}:driver-django-${{ github.run_number }}
-          docker push ${{ secrets.ECR_REPO_PROD }}:driver-database-${{ github.run_number }}
+          docker push ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          docker push ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
 
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
@@ -126,7 +126,7 @@ jobs:
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
           echo "Database Image Tag: $DATABASE_IMAGE_TAG"
             
-            #aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_PROD
+            #aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
             
             # Pull the latest Docker image from ECR
             cd /var/www/driver-new-tech
