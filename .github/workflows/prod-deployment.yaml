@@ -101,6 +101,8 @@ jobs:
           chmod 600 private_key.pem
           pwd
           ls -al
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem"  /home/runner/work/driver-new-tech/driver-new-tech/pre-installation.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/pre-installation.sh
           sudo rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME_PROD }}:/var/www/driver-new-tech/
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
           rm private_key.pem
@@ -117,9 +119,9 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
 
-          cd /var/www/driver-new-tech
-          sudo chmod +x pre-installation.sh
-          sudo bash pre-installation.sh
+          # cd /var/www/driver-new-tech
+          # sudo chmod +x pre-installation.sh
+          # sudo bash pre-installation.sh
 
           # Check if AWS CLI is working with the credentials set permanently
           echo "=====================    Check if AWS CLI is working with the credentials  ================================ "
