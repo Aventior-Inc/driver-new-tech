@@ -184,7 +184,7 @@ jobs:
             # Restart the containers using docker-compose (this will pull the latest images
             sudo docker compose up -d
             sudo sleep 10
-            sudo bash configure.sh
+            sudo bash /var/www/configure.sh
             # Clean up any stopped containers
             docker image prune -a -f
             ## sudo docker container prune -f
