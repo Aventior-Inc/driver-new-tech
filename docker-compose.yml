@@ -20,7 +20,7 @@ services:
         #command: ["postgres", "-c", "log_statement=all"]
     command: ["postgres", "-c", "log_statement=all", "-c", "log_duration=on"]
     container_name: database
-    image: ${ECR_REPO}:${DATABASE_IMAGE_TAG}
+    image: ${ECR_REPO_PROD}:${DATABASE_IMAGE_TAG}
 
 
   redis-server:
@@ -88,7 +88,7 @@ services:
       - "4000:4000"
     command: python manage.py runserver 0.0.0.0:4000
     container_name: driver-new-tech
-    image: ${ECR_REPO}:${DJANGO_IMAGE_TAG}
+    image: ${ECR_REPO_PROD}:${DJANGO_IMAGE_TAG}
 
   driver-celery:
     volumes:
@@ -116,4 +116,4 @@ services:
       #- OAUTH_CLIENT_SECRET=""
     entrypoint: ["celery", "-A", "DRIVER", "worker", "--queues=taskworker", "--loglevel=info", "--concurrency=4"]
     container_name: driver-celery-${CONTAINER_NAME}
-    image: ${ECR_REPO}:${DJANGO_IMAGE_TAG}
+    image: ${ECR_REPO_PROD}:${DJANGO_IMAGE_TAG}
