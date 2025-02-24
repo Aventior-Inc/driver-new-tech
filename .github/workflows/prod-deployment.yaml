@@ -102,7 +102,7 @@ jobs:
           pwd
           ls -al
           sudo rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME_PROD }}:/var/www/driver-new-tech/
-          sudo chown -R ubuntu:docker /var/www/***-new-tech/
+          sudo chown -R ubuntu:ubuntu /var/www/***-new-tech/
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/export_creds.sh"
           rm private_key.pem
