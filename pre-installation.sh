@@ -48,8 +48,25 @@ sudo apt-get update -y
 sudo apt-get install nginx
 fi
 
-sudo mkdir -p /var/www/driver-new-tech
-sudo chmod -R 755 /var/www/driver-new-tech/
-sudo chown -R ubuntu:ubuntu /var/www/***-new-tech/
+if ! command -v psql &> /dev/null; then
+    echo "psql not found, installing..."
+sudo apt-get update -y
+sudo apt install postgresql-client -y
+fi
+
+if [ ! -d "/var/www/driver-new-tech/" ]; then
+    # Create the directory
+    sudo mkdir -p /var/www/driver-new-tech/
+    
+    # Change ownership to the desired user and group (replace 'user' and 'group' accordingly)
+    sudo chown -R ubuntu:ubuntu /var/www/driver-new-tech/
+    
+    # Set the correct permissions (e.g., 755, or adjust based on your needs)
+    sudo chmod -R 755 /var/www/driver-new-tech/
+    
+    echo "Directory created, ownership and permissions set."
+else
+    echo "Directory already exists. No changes made."
+fi
 
 
