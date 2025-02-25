@@ -59,7 +59,6 @@ if [ ! -d "/var/www/driver-new-tech/" ]; then
     sudo mkdir -p /var/www/driver-new-tech/
     
     # Change ownership to the desired user and group (replace 'user' and 'group' accordingly)
-    sudo chown -R ubuntu:ubuntu /var/www/driver-new-tech/
     
     # Set the correct permissions (e.g., 755, or adjust based on your needs)
     sudo chmod -R 755 /var/www/driver-new-tech/
