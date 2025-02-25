@@ -11,9 +11,9 @@ sudo chmod -R 777 /var/log/django
 
 sudo chmod 777 /var/run/docker.sock
 
-cd /var/www/
-git clone git@github.com:Aventior-Inc/driver-new-tech.git
-sudo chmod 777 driver-new-tech/
+# cd /var/www/
+# git clone git@github.com:Aventior-Inc/driver-new-tech.git
+# sudo chmod 777 driver-new-tech/
 
 cd ~
 # sudo rm -rf driver-new-tech/
