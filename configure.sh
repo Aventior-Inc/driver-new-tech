@@ -8,7 +8,7 @@ if [[ ! -d "zip" ]]; then
 fi
 if [[ ! -d "postgres_data" ]]; then
      mkdir postgres_data
-     docker-compose restart postgres
+     docker compose restart postgres
 fi
 while read line; do export "$line"; done < .env
 echo "START"
@@ -28,7 +28,8 @@ if [ "${EXISTE_CELERY}" != "" ]; then
      CELERY_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' driver-celery-${CONTAINER_NAME})
 fi
 
-cp driver-app.conf nginx/driver.conf
+cd /var/www/driver-new-tech
+sudo cp driver-app.conf nginx/driver.conf
 sed -i -e "s/HOST_NAME/${HOST_NAME}/g" \
 	-e "s,STATIC_ROOT,$STATIC_ROOT,g" \
 	-e "s,DIST_ROOT,$DIST_ROOT,g" \
@@ -54,7 +55,8 @@ fi
 if [ $STATIC_ROOT != $WINDSHAFT_FILES ]; then
      sudo cp -r static "$STATIC_ROOT/"
 fi
+cd /var/www/driver-new-tech
 sudo mv nginx/driver.conf /etc/nginx/sites-enabled/default
 sudo service nginx restart
 echo "Remember to run certbot now."
-docker-compose restart driver-nginx
+docker compose restart driver-nginx
