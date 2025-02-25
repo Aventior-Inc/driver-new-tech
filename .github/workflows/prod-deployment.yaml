@@ -46,8 +46,6 @@ jobs:
           echo "ECR_REPO=${{ secrets.ECR_REPO }}" >> .env
           ls -al
           # Give execute permission to production_host.sh
-          chmod +x pre-installation.sh
-          ./pre-installation.sh
           chmod +x production_host.sh
           # Run the production_host.sh script
           ./production_host.sh
