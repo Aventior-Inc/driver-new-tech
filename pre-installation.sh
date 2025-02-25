@@ -42,6 +42,12 @@ if ! command -v aws &> /dev/null; then
     sudo ./aws/install
 fi
 
+if ! command -v nginx &> /dev/null; then
+    echo "nginx not found, installing..."
+sudo apt-get update -y
+sudo apt-get install nginx
+fi
+
 sudo mkdir -p /var/www/driver-new-tech
 sudo chmod -R 755 /var/www/driver-new-tech/
 sudo chown -R ubuntu:ubuntu /var/www/***-new-tech/
