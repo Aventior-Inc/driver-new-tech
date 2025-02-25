@@ -46,11 +46,13 @@ jobs:
           echo "ECR_REPO=${{ secrets.ECR_REPO }}" >> .env
           ls -al
           # Give execute permission to production_host.sh
+          chmod +x pre-installation.sh
+          ./pre-installtion.sh
           chmod +x production_host.sh
           # Run the production_host.sh script
           ./production_host.sh
            # Build the Docker image
-          docker-compose -f docker-compose.yml build
+          docker compose -f docker-compose.yml build
 
       - name: Tagging of image and Push to ECR
         run: |
