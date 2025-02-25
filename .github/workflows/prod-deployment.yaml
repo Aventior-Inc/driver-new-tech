@@ -105,8 +105,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/pre-installation.sh"
           sudo rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.HOST_NAME_PROD }}:/var/www/driver-new-tech/
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.HOST_NAME_PROD }}:/home/ubuntu/driver-new-tech/
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/production_host.sh"
           rm private_key.pem
-        # ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} "bash /home/ubuntu/driver-new-tech/export_creds.sh"
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       
@@ -132,20 +132,20 @@ jobs:
           echo "logging in ecr"
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
-          cd /var/www/driver-new-tech
-           chmod +x production_host.sh
-           bash production_host.sh
+          # cd /var/www/driver-new-tech
+          # chmod +x production_host.sh
+          # bash production_host.sh
 
-            # Pull the latest Docker image from ECR
-            cd /var/www/driver-new-tech
-            docker compose pull
-            # Restart the containers using docker-compose (this will pull the latest images
-            sudo docker compose up -d
-            sudo sleep 10
-            sudo bash configure.sh
-            # Clean up any stopped containers
-            docker image prune -a -f
-            ## sudo docker container prune -f
+          # Pull the latest Docker image from ECR
+          cd /var/www/driver-new-tech
+          docker compose pull
+          # Restart the containers using docker-compose (this will pull the latest images
+          sudo docker compose up -d
+          sudo sleep 10
+          sudo bash configure.sh
+          # Clean up any stopped containers
+          docker image prune -a -f
+          ## sudo docker container prune -f
           EOF
         env: 
           ECR_REPO: ${{ secrets.ECR_REPO }}
