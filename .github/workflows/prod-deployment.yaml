@@ -132,12 +132,9 @@ jobs:
           echo "logging in ecr"
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
-          echo "changing permission and ownership"
-          sudo chown sudo chown -R ubuntu:ubuntu /var/www/driver-new-tech/
-
-          cd /home/ubuntu/driver-new-tech
+          cd /var/www/driver-new-tech
            chmod +x production_host.sh
-          ./production_host.sh
+           bash production_host.sh
 
             # Pull the latest Docker image from ECR
             cd /var/www/driver-new-tech
