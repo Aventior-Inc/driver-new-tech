@@ -1,8 +1,5 @@
 sudo apt-get update
-if ! command -v docker &> /dev/null; then
-    echo "Docker not found, installing..."
 sudo apt-get install docker-compose
-fi
 
 sudo apt-get update
 sudo apt-get install nginx
