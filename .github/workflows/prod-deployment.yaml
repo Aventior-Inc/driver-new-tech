@@ -119,10 +119,6 @@ jobs:
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
 
-          # cd /var/www/driver-new-tech
-          # sudo chmod +x pre-installation.sh
-          # sudo bash pre-installation.sh
-
           # Check if AWS CLI is working with the credentials set permanently
           echo "=====================    Check if AWS CLI is working with the credentials  ================================ "
           aws sts get-caller-identity
@@ -138,6 +134,10 @@ jobs:
 
           echo "changing permission and ownership"
           sudo chown sudo chown -R ubuntu:ubuntu /var/www/driver-new-tech/
+
+          cd /home/ubuntu/driver-new-tech
+           chmod +x production_host.sh
+          ./production_host.sh
 
             # Pull the latest Docker image from ECR
             cd /var/www/driver-new-tech
