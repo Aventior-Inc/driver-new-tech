@@ -45,7 +45,10 @@ fi
 if ! command -v nginx &> /dev/null; then
     echo "nginx not found, installing..."
 sudo apt-get update -y
-sudo apt-get install nginx
+sudo apt-get install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
 fi
 
 if ! command -v psql &> /dev/null; then
