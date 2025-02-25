@@ -1,5 +1,5 @@
-sudo apt-get update
-sudo apt-get install docker-compose
+# sudo apt-get update
+# sudo apt-get install docker-compose
 
 sudo apt-get update
 sudo apt-get install nginx
@@ -16,7 +16,7 @@ git clone git@github.com:Aventior-Inc/driver-new-tech.git
 sudo chmod 777 driver-new-tech/
 
 cd ~
-sudo rm -rf driver-new-tech/
+# sudo rm -rf driver-new-tech/
 
 cd /var/www/
 sudo mkdir media
