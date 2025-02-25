@@ -1,7 +1,7 @@
-sudo apt-get update
-sudo apt-get install docker-compose
+# sudo apt-get update
+# sudo apt-get install docker-compose
 
-sudo apt install postgresql-client -y
+# sudo apt install postgresql-client -y
 
 sudo mkdir -p /var/log/django
 sudo chmod -R 777 /var/log/django
