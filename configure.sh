@@ -53,7 +53,7 @@ if [ "${EXISTE_DJANGO}" != "" ]; then
      docker exec -it $(docker inspect -f '{{.ID}}' driver-new-tech) python manage.py createsuperuser
 fi
 if [ $STATIC_ROOT != $WINDSHAFT_FILES ]; then
-     sudo cp -r /var/www/static "$STATIC_ROOT/"
+     sudo cp -r static "$STATIC_ROOT/"
 fi
 cd /var/www/driver-new-tech
 sudo mv nginx/driver.conf /etc/nginx/sites-enabled/default
