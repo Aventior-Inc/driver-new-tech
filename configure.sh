@@ -39,19 +39,6 @@ sudo sed -i -e "s,DIST_ROOT,${DIST_ROOT},g" /var/www/driver-new-tech/nginx/drive
 sudo sed -i -e "s/driver-new-tech/${DJANGO_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
 sudo sed -i -e "s/driver-celery/${CELERY_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
 sudo sed -i -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" /var/www/driver-new-tech/nginx/driver.conf
-
-# sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" nginx/driver.conf
-# echo $HOST_NAME
-# sudo sed -i -e "s,STATIC_ROOT,$STATIC_ROOT,g" nginx/driver.conf
-# echo $STATIC_ROOT
-# sudo sed -i -e "s,DIST_ROOT,$DIST_ROOT,g" nginx/driver.conf
-# echo $DIST_ROOT
-# echo "replacing variables"
-# sudo sed -e "s/driver-new-tech/${DJANGO_HOST}/g" nginx/driver.conf
-# echo $DJANGO_HOST
-# sudo sed -e "s/driver-celery/${CELERY_HOST}/g" nginx/driver.conf
-# echo $CELERY_HOST
-# sudo sed -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" nginx/driver.conf
 echo "replaced variables"
 
 ## sudo docker exec driver-nginx sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /etc/nginx/conf.d/driver-app.conf
