@@ -30,8 +30,15 @@ fi
 
 cd /var/www/driver-new-tech
 sudo cp driver-app.conf nginx/driver.conf
+echo $CELERY_HOST
+echo $DJANGO_HOST
 echo "copied file from driver-app.conf"
-sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /var/www/driver-new-tech/nginx/driver.conf && sudo sed -i -e "s/STATIC_ROOT/${STATIC_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf && sudo sed -i -e "s/DIST_ROOT/${DIST_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf && sudo sed -i -e "s/driver-new-tech/${DJANGO_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf && sudo sed -i -e "s/driver-celery/${CELERY_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf && sudo sed -i -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/STATIC_ROOT/${STATIC_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/DIST_ROOT/${DIST_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/driver-new-tech/${DJANGO_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/driver-celery/${CELERY_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" /var/www/driver-new-tech/nginx/driver.conf
 
 # sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" nginx/driver.conf
 # echo $HOST_NAME
