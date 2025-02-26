@@ -57,7 +57,6 @@ jobs:
       - name: Tagging of image and Push to ECR
         run: |
           # Log in to ECR
-          #aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
           ECR_REGISTRY=$(echo "${{ secrets.ECR_REPO }}" | cut -d '/' -f1)
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
 
@@ -121,10 +120,6 @@ jobs:
 
           # SSH into EC2 and deploy using Docker Compose
            ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.HOST_NAME_PROD }} << EOF
-
-          # Check if AWS CLI is working with the credentials set permanently
-          echo "=====================    Check if AWS CLI is working with the credentials  ================================ "
-          aws sts get-caller-identity
           
           # Navigate to the project director
           echo "Django Image Tag: $DJANGO_IMAGE_TAG"
@@ -135,10 +130,6 @@ jobs:
           echo "logging in ecr"
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
-          # cd /var/www/driver-new-tech
-          # chmod +x production_host.sh
-          # bash production_host.sh
-
           # Pull the latest Docker image from ECR
           cd /var/www/driver-new-tech
           docker compose pull
@@ -148,7 +139,6 @@ jobs:
           sudo bash configure.sh
           # Clean up any stopped containers
           docker image prune -a -f
-          ## sudo docker container prune -f
           EOF
         env: 
           ECR_REPO: ${{ secrets.ECR_REPO }}
