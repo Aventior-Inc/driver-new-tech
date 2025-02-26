@@ -30,15 +30,16 @@ fi
 
 cd /var/www/driver-new-tech
 sudo cp driver-app.conf nginx/driver.conf
-sed -i -e "s/HOST_NAME/${HOST_NAME}/g" \
-	-e "s,STATIC_ROOT,$STATIC_ROOT,g" \
-	-e "s,DIST_ROOT,$DIST_ROOT,g" \
--e "s/driver-new-tech/${DJANGO_HOST}/g" \
--e "s/driver-celery/${CELERY_HOST}/g" \
--e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" \
-nginx/driver.conf
+echo "copied file from driver-app.conf"
+sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" nginx/driver.conf
+sudo sed -i -e "s,STATIC_ROOT,$STATIC_ROOT,g" nginx/driver.conf
+sudo sed -i -e "s,DIST_ROOT,$DIST_ROOT,g" nginx/driver.conf
+echo "replacing variables"
+sudo sed -e "s/driver-new-tech/${DJANGO_HOST}/g" nginx/driver.conf
+sudo sed -e "s/driver-celery/${CELERY_HOST}/g" nginx/driver.conf
+sudo sed -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" nginx/driver.conf
 
-docker exec driver-nginx sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /etc/nginx/conf.d/driver-app.conf
+sudo docker exec driver-nginx sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /etc/nginx/conf.d/driver-app.conf
 
 if [ $PROTOCOL == "http" ]
 then
