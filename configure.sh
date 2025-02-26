@@ -21,11 +21,11 @@ EXISTE_DJANGO=$(docker ps | grep driver-new-tech)
 EXISTE_CELERY=$(docker ps | grep driver-celery-${CONTAINER_NAME})
 DJANGO_HOST="localhost"
 if [ "${EXISTE_DJANGO}" != "" ]; then
-     DJANGO_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' driver-new-tech)
+      export DJANGO_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' driver-new-tech)
 fi
 CELERY_HOST="localhost"
 if [ "${EXISTE_CELERY}" != "" ]; then
-     CELERY_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' driver-celery-${CONTAINER_NAME})
+     export CELERY_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' driver-celery-${CONTAINER_NAME})
 fi
 
 cd /var/www/driver-new-tech
@@ -34,8 +34,8 @@ echo $CELERY_HOST
 echo $DJANGO_HOST
 echo "copied file from driver-app.conf"
 sudo sed -i -e "s/HOST_NAME/${HOST_NAME}/g" /var/www/driver-new-tech/nginx/driver.conf
-sudo sed -i -e "s/STATIC_ROOT/${STATIC_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
-sudo sed -i -e "s/DIST_ROOT/${DIST_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s,STATIC_ROOT,${STATIC_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
+sudo sed -i -e "s,DIST_ROOT,${DIST_ROOT},g" /var/www/driver-new-tech/nginx/driver.conf
 sudo sed -i -e "s/driver-new-tech/${DJANGO_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
 sudo sed -i -e "s/driver-celery/${CELERY_HOST}/g" /var/www/driver-new-tech/nginx/driver.conf
 sudo sed -i -e "s/windshaft/$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' windshaft)/g" /var/www/driver-new-tech/nginx/driver.conf
