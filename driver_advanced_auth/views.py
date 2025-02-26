@@ -14,7 +14,8 @@ from driver_advanced_auth.serializers import (RequestSerializer, CitySerializer,
                                               GroupSerializer, GroupSerializerNew, AdvAuthSerializer, UserSerializer,
                                               AdvUserSerializer, DetailsSerializer, ApproveRejectRequestSerializer,
                                               RejectRequestSerializer, TokenSerializer, GoogleUserSerializer,
-                                              CountryInfoSerializer, LanguageDetailSerializer) # SendRoleRequestSerializer
+                                              CountryInfoSerializer,
+                                              LanguageDetailSerializer)  # SendRoleRequestSerializer
 from data.serializers import DriverRecordCopySerializer, WeatherInfoSerializer, BaseDriverRecordSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -53,6 +54,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 logger = logging.getLogger(__name__)
+
 
 # Create new user (Sign up form) and get all user
 class UserList(APIView):
@@ -361,6 +363,7 @@ class DriverGroupDetail(APIView):
         serializer = AssociateGroupSerializer(instance)
         return Response([{"Data": serializer.data, "message": "details updated", "status": True}], status=200)
 
+
 # Edit auth users and their permissions
 class GroupById(APIView):
 
@@ -514,7 +517,7 @@ class RequestForRole(APIView):
                 'You have successfully requested for a new role!',
                 from_email,
                 [to_email],
-                fail_silently=False,
+                fail_silently=True,
                 auth_password=email_host_password
             )
             return Response([{"data": serializer.data, "message": "success", "status": True}],
@@ -568,7 +571,7 @@ class AcceptRoleRequest(APIView):
                 'Your request to change the role has been accepted',
                 from_email,
                 [to_email],
-                fail_silently=False,
+                fail_silently=True,
                 auth_password=email_host_password
             )
             return Response([{"message": "Request Approved Successfully", "status": True}], status=200)
@@ -601,7 +604,7 @@ class RejectRoleRequest(APIView):
                 'Sorry! Your request to change the role has been declined',
                 from_email,
                 [to_email],
-                fail_silently=False,
+                fail_silently=True,
                 auth_password=email_host_password
             )
             return Response([{"message": "Request Rejected Succesfully", "status": True}], status=200)
@@ -710,11 +713,10 @@ class UserRegistrationAPI(APIView):
             token_dict = {'token': token.key}
             group_dict = {'groupdetail': group_list}
             to_email = serializer.validated_data['email']
-            subject, from_email, to = 'DRIVER 2.0 Registration', settings.DEFAULT_FROM_EMAIL, to_email,
+            subject, from_email, to = 'Welcome to Driver 2.0 – Your Account is Ready!', settings.DEFAULT_FROM_EMAIL, to_email,
             html_content = (
-                '<h2>Congratulations !!</h2><br><h5>You have successfully registered with DRIVER 2.0<h5>'.format(
-                    to_email,
-                    user_id))
+                '<b>Talofa, {} </b><br>Welcome to <b>Driver 2.0</b>! Your account has been successfully created.<h5><br> Best regards,<br>Driver 2.0 Team'.format(
+                    self.request.data['username'], to_email, user_id))
             text_content = ' '
             if subject and from_email:
                 try:
@@ -722,7 +724,7 @@ class UserRegistrationAPI(APIView):
                     settings.EMAIL_HOST_PASSWORD = email_host_password
                     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
                     msg.attach_alternative(html_content, "text/html")
-                    msg.send()
+                    # msg.send(fail_silently=True)
                 except BadHeaderError:
                     return JsonResponse({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -937,6 +939,7 @@ class RegionOrganization(APIView):
                 query_list.extend(queryset)
         serializer = CitySerializer(query_list, many=True)
         return Response([{"data": serializer.data, "message": "success", "status": True}], status=200)
+
 
 class RoleDetails(APIView):
     """Viewset to get the details of requested role,useful for accept/reject role request"""
@@ -1211,7 +1214,7 @@ class RegisterGoogleUser(APIView):
                         settings.EMAIL_HOST_PASSWORD = email_host_password
                         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
                         msg.attach_alternative(html_content, "text/html")
-                        msg.send()
+                        # msg.send(fail_silently=True)
                     except BadHeaderError:
                         return JsonResponse({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
                 else:
@@ -1290,6 +1293,7 @@ class GetJsonSchemaKey(APIView):
 
         rec_type_obj = RecordType.objects.filter(label="Incident").last()
         record_type_id = rec_type_obj.uuid
+        host = settings.API_HOST
         base_url = str(settings.HOST_URL) + "/data-api/latestrecordschema/"
         token = request.META.get('HTTP_AUTHORIZATION')
         response = requests.post(base_url,
@@ -1340,7 +1344,6 @@ class LanguageDetailsViewSet(viewsets.ModelViewSet):
     filterset_class = LanguageDetailFilter
     permission_classes = []
 
-    
     def get_queryset(self):
         return LanguageDetail.objects.all()
 
@@ -1522,7 +1525,8 @@ def check_required_data(self):
     country_obj = CountryInfo.objects.all().count()
 
     if (country_obj and lang_obj and schema_obj and geography_obj) < 1:
-        return Response({"message": "Please check if the following are added: Language Translation, Schema, Geography and Country Details"})
+        return Response({
+                            "message": "Please check if the following are added: Language Translation, Schema, Geography and Country Details"})
 
     elif lang_obj == 1:
         return Response({"message": "Please make sure language for Ashlar Editor and User Panel is added"})
@@ -1549,7 +1553,6 @@ def intervention_type_detail(self, uuid):
         return Response(response_dict)
     except Exception as e:
         raise Exception(e)
-
 
 
 class Test(APIView):
@@ -1608,16 +1611,17 @@ def send_update_password_link(request):
         text_content = 'This is an important message.'
         html_content = f'<p>Hi <strong>{user_obj.username}</strong>,</p>' \
                        f'<p>As you have requested for reset password instructions, here they are, please follow the URL:' \
-                       f'</p><a href={password_reset_link +"/"+ hash_key}>Reset Password</a>' \
+                       f'</p><a href={password_reset_link + "/" + hash_key}>Reset Password</a>' \
                        f'<p>Alternatively, open the following url in your browser</p>' \
                        f'<p>{password_reset_link + "/" + hash_key}</p> <p style="color:red;"> <b> ** The link is valid only for 15 minutes. </b></p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        msg.send(fail_silently=True)
     except:
         return Response(data={"message": "SMTP Error"}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(data={"message": "Password Reset link has been sent to your registered email"}, status=status.HTTP_200_OK)
+    return Response(data={"message": "Password Reset link has been sent to your registered email"},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -1633,9 +1637,11 @@ def validate_reset_password_url(request):
         created_time = user_detail_obj.password_update_hash_created_at
         valid = timezone.now() <= created_time + timedelta(minutes=15)
         if not valid:
-            return Response(data={"message": "The link is expired. Please reset password again."}, status=status.HTTP_200_OK)
+            return Response(data={"message": "The link is expired. Please reset password again."},
+                            status=status.HTTP_200_OK)
     except UserDetail.DoesNotExist:
-        return Response(data={"message": "The link is either not valid or expired. Please reset password again."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"message": "The link is either not valid or expired. Please reset password again."},
+                        status=status.HTTP_404_NOT_FOUND)
 
     return Response(status=status.HTTP_200_OK)
 
@@ -1669,7 +1675,8 @@ def update_password(request):
     previous_passwords = PasswordHistory.objects.filter(user_id=user_obj)
     for prev_password in previous_passwords:
         if prev_password.hashed_password == new_hashed_password:
-            return Response(data={"message": "You cannot reuse your recent passwords."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"message": "You cannot reuse your recent passwords."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     PasswordHistory.objects.create(user_id=user_obj, hashed_password=new_hashed_password)
 
@@ -1684,3 +1691,19 @@ def update_password(request):
     user_detail_obj.save()
 
     return Response(data={"message": "Password Successfully Updated"}, status=status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+@authentication_classes([])
+@permission_classes([])
+def retrieve_user(request, pk):
+    """
+    To retrieve the archived user credentials
+    """
+    user = User.objects.get(id=pk)
+    user.is_active = True
+    user.save()
+    driver_user = UserDetail.objects.get(user=pk)
+    driver_user.is_active = True
+    driver_user.save()
+    return Response([{"message": "Details updated successfully", "status": "true"}], status=200)

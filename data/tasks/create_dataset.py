@@ -28,7 +28,7 @@ def create_dataset():
                        "((select driver_advanced_auth_userdetail.id from driver_advanced_auth_userdetail),1);")
 
         cursor.execute("insert into driver_advanced_auth_countryinfo (country_code, country_name, archived, latitude, "
-                       "longitude) values ('ph', 'Philippines', True, 14.689881366618774, 121.02539062500001);")
+                       "longitude) values ('ws', 'Samoa', True, -13.752724664397, -171.826171875);")
 
         cursor.execute("insert into data_duplicatedistanceconfig(dedupe_distance_threshold,unit,created,modified) "
                        "values (0.0009,'degree', '2020-07-30T08:11:42.706240Z', '2020-07-30T08:11:42.706240Z');")
@@ -102,7 +102,6 @@ def create_dataset():
                        "('Partly Cloudy Night','partly-cloudy-night', True),"
                        "('Rain','rain', True),"
                        "('Sleet','sleet', True),"
-                       "('Snow','snow', True),"
                        "('Thunderstorm','thunderstorm', True),"
                        "('Tornado','tornado', True),"
                        "('Wind','wind', True),"
@@ -134,15 +133,8 @@ def create_dataset():
                        "('Shower rain','shower rain', True),"
                        "('Heavy intensity shower rain','heavy intensity shower rain', True),"
                        "('Ragged shower rain','ragged shower rain', True),"
-                       "('Light snow','light snow', True),"
-                       "('Heavy snow','Heavy snow', True),"
                        "('Light shower sleet','Light shower sleet', True),"
                        "('Shower sleet','Shower sleet', True),"
-                       "('Light rain and snow','Light rain and snow', True),"
-                       "('Rain and snow','Rain and snow', True),"
-                       "('Light shower snow','Light shower snow', True),"
-                       "('Shower snow','Shower snow', True),"
-                       "('Heavy shower snow','Heavy shower snow', True),"
                        "('Mist','mist', True),('Smoke','Smoke', True),"
                        "('Haze','Haze', True),"
                        "('Sand/ dust whirls','sand/ dust whirls', True),"

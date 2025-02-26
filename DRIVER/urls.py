@@ -77,5 +77,6 @@ urlpatterns = [
     path('api/irap-getdataset/', getdataset),
     path('api/irap-getlat_lon/', getlat_lon),
     path('api/irap-fatalitydata/', fatalitydata),
-    path('api/generate-record-pdf-report/', data_views.DriverRecordReportView.as_view(), name='generate-record-pdf-report')
+    path('api/generate-record-pdf-report/', data_views.DriverRecordReportView.as_view(), name='generate-record-pdf-report'),
+    path('api/retrieve-user/<int:pk>/', views.retrieve_user)
 ]
