@@ -781,23 +781,27 @@ class AdvUserRegisterAPI(APIView):
     def get(self, request):
         get_data = request.query_params
         paginator = OptionalLimitOffsetPagination()
+
+        is_active = False if get_data.get('is_active', True) == "false" else True
+
         if get_data['groups'] != '0' and get_data['user'] != 'blank':
             criterion1 = (Q(first_name__iexact=get_data['user'])
                           | Q(last_name__iexact=get_data['user'])
                           | Q(email=get_data['user']))
             criterion2 = (Q(groups__id=get_data['groups'])
-                          & Q(is_active=True))
+                          & Q(is_active=is_active))
             user_obj = UserDetail.objects.filter(criterion1 & criterion2).order_by('-date_joined').distinct()
         elif get_data['groups'] != '0' and get_data['user'] == 'blank':
-            user_obj = UserDetail.objects.filter(is_active=True, groups__id=get_data['groups']).order_by('-date_joined')
+            user_obj = UserDetail.objects.filter(is_active=is_active, groups__id=get_data['groups']).order_by(
+                '-date_joined')
         elif get_data['user'] != 'blank' and get_data['groups'] == '0':
             user_obj = UserDetail.objects.filter(Q(first_name__iexact=get_data['user'])
                                                  | Q(last_name__iexact=get_data['user'])
-                                                 | Q(email=get_data['user'], is_active=True)) \
+                                                 | Q(email=get_data['user'], is_active=is_active)) \
                 .order_by('-date_joined').distinct()
 
         else:
-            user_obj = UserDetail.objects.filter(is_active=True, ).order_by('-date_joined')
+            user_obj = UserDetail.objects.filter(is_active=is_active).order_by('-date_joined')
         quesryset = paginator.paginate_queryset(user_obj, request)
         serializer = AdvUserSerializer(quesryset, many=True)
         return paginator.get_paginated_response([serializer.data])
