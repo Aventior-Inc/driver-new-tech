@@ -3,13 +3,13 @@ from . import views
 from data import views as data_views
 
 urlpatterns = [
-    # path('newusers/', views.UserList.as_view()),#not in use
-    # re_path(r'userbyid/(?P<pk>[0-9]+)/$', views.UserById.as_view()),#not in use
-    # re_path(r'groupbyid/(?P<pk>[0-9]+)/$', views.GroupById.as_view()),#not in use
-    # path('city/', views.CityList.as_view()),#not in use for samoa
-    # path('getregion/', views.GetRegion.as_view()),#not in use for samoa
-    #
-    # path('getcountry/', views.GetCountry.as_view()),#not in use
+    path('newusers/', views.UserList.as_view()),#not in use
+    re_path(r'userbyid/(?P<pk>[0-9]+)/$', views.UserById.as_view()),#not in use
+    re_path(r'groupbyid/(?P<pk>[0-9]+)/$', views.GroupById.as_view()),#not in use
+    path('city/', views.CityList.as_view()),#not in use for samoa
+    path('getregion/', views.GetRegion.as_view()),#not in use for samoa
+    path('getcountry/', views.GetCountry.as_view()),#not in use
+
     path('org/', views.OrganizationList.as_view()),
     path('driver-group/', views.DriverGroup.as_view()),
     path('getcontentpermission/', views.GetContentTypesbyname.as_view()),

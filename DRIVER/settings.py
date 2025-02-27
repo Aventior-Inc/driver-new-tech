@@ -29,6 +29,10 @@ STAGING = True if os.environ.get('DJANGO_ENV', 'staging') == 'staging' else Fals
 PRODUCTION = not DEVELOP and not STAGING
 DEBUG = DEVELOP
 ALLOWED_HOSTS = ['*']
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://driver-samoa.com",
+#     "https://www.driver-samoa.com"
+# ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -47,26 +51,20 @@ INSTALLED_APPS = [
     'storages',
     'corsheaders',
     'django_filters',
-
     'django_extensions',
     'rest_framework_gis',
-
     'grout',
-
     'driver_advanced_auth',
     'data',
     'black_spots',
     'user_filters',
-
     # allauth apps
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 
     # for google
-    'allauth.socialaccount.providers.google',
-
-    # 'django_celery_beat'
+    'allauth.socialaccount.providers.google'
 ]
 
 # old
