@@ -1,4 +1,4 @@
-name: Build & Deploy on GCP Compute Engine (No Code Push)
+name: Build & Deploy on GCP
 
 on:
   push:
@@ -77,8 +77,8 @@ jobs:
             # Deploy updated containers
             docker compose up -d
             docker image prune -a -f
-EOF
-          rm gce_private_key.pem
+            EOF
+            rm gce_private_key.pem
 
       - name: Cleanup local tar files
         run: |
