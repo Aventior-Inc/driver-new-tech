@@ -55,3 +55,14 @@ jobs:
           ./production_host.sh
            # Build the Docker image
           docker compose -f docker-compose.yml build
+
+      - name: Tag images
+        run: |
+          # Configure Docker to use gcloud as a credential helper for GCR
+          gcloud auth configure-docker
+          # Tag the images with the appropriate repository and tag
+          docker tag driver-django:${{ github.run_number }} ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
+          docker tag driver-database:${{ github.run_number }} ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
+          # Export tags for use on the remote instance if needed
+          echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
