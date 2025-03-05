@@ -1,0 +1,27 @@
+name: Build, push & Deploy on Compute Engine
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Even if you don’t need to push updated code, you might still
+      # need to check out the repository so that the Docker build has access to the Dockerfile, compose file, etc.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: Aventior-Inc/driver-new-tech
+          ref: staging
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
