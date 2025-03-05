@@ -26,6 +26,10 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true     
           
+      - name: Verify gcloud authentication
+        run: gcloud auth list
+
+          
       - name: Create .env file for the Docker container & build image
         run: |
           pwd
