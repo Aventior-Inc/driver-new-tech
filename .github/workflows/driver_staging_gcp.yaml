@@ -30,6 +30,7 @@ jobs:
         run: |
           echo "${{ secrets.GCP_SA_KEY }}" > key.json
           gcloud auth activate-service-account --key-file=key.json
+          cat key.json
           gcloud auth list
 
       - name: Create .env file for the Docker container & build image
