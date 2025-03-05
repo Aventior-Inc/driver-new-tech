@@ -69,3 +69,11 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
+      
+      - name: Get public IP of GitHub Actions Runner
+        id: get_ip
+        run: |
+          # Fetch the public IP address of the GitHub Actions runner using a public service
+          IP_ADDRESS=$(curl -s https://ifconfig.me)
+          echo "IP_ADDRESS=$IP_ADDRESS" >> $GITHUB_ENV
+          echo "GitHub Actions Runner IP: $IP_ADDRESS"
