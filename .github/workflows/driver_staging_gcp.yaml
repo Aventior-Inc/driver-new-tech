@@ -3,7 +3,7 @@ name: Build, push & Deploy on Compute Engine
 on:
   push:
     branches:
-      - staging
+      - production
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Aventior-Inc/driver-new-tech
-          ref: staging
+          ref: production
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -25,29 +25,32 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true     
-      - name: Build Docker images
+          
+      - name: Create .env file for the Docker container & build image
         run: |
           pwd
           ls -al
-          # Create the .env file for Docker build configuration
           echo "HOST_NAME=${{ secrets.GCP_HOST_NAME }}" > .env
           echo "HOST_URL=${{ secrets.GCP_HOST_URL }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> .env
-          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES }}" >> .env
-          echo "TIMEZONE=${{ secrets.TIMEZONE }}" >> .env
-          echo "PROTOCOL=${{ secrets.PROTOCOL }}" >> .env
-          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env
-          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT }}" >> .env
-          echo "DIST_ROOT=${{ secrets.DIST_ROOT }}" >> .env
-          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER_PROD }}" >> .env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD_PROD }}" >> .env
+          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES_PROD }}" >> .env
+          echo "TIMEZONE=${{ secrets.TIMEZONE_PROD }}" >> .env
+          echo "PROTOCOL=${{ secrets.PROTOCOL_PROD }}" >> .env
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME_PROD }}" >> .env
+          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT_PROD }}" >> .env
+          echo "DIST_ROOT=${{ secrets.DIST_ROOT_PROD }}" >> .env
+          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT_PROD }}" >> .env
           echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
           ls -al
-          # If additional host configuration is required, run the script
+          # Give execute permission to production_host.sh
+          chmod +x pre-installation.sh
+          ./pre-installation.sh
           chmod +x production_host.sh
+          # Run the production_host.sh script
           ./production_host.sh
-          # Build Docker images using Docker Compose
-          docker-compose -f docker-compose.yml build
+           # Build the Docker image
+          docker compose -f docker-compose.yml build
