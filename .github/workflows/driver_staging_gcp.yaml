@@ -62,9 +62,10 @@ jobs:
           gcloud auth configure-docker
           echo "======  check images  ======="
           docker images
-          echo "=========  Tag the images with the appropriate repository and tag  ========="
-          docker tag driver-django:${{ github.run_number }} ${{ secrets.ECR_REPO }}:driver-django-${{ github.run_number }}
-          docker tag driver-database:${{ github.run_number }} ${{ secrets.ECR_REPO }}:driver-database-${{ github.run_number }}
           echo "========  Export tags for use on the remote instance if needed  ========="
           echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> $GITHUB_ENV
           echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> $GITHUB_ENV
+      - name: SSH into Compute Engine for deployment
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
