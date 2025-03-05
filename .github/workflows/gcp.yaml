@@ -1,0 +1,85 @@
+name: Build & Deploy on GCP Compute Engine (No Code Push)
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository (build context only)
+        uses: actions/checkout@v4
+        with:
+          repository: Aventior-Inc/driver-new-tech
+          ref: production
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true     
+
+      - name: Create .env file & Build Docker Images
+        run: |
+          pwd
+          ls -al
+          echo "HOST_NAME=${{ secrets.GCP_HOST_NAME }}" > .env
+          echo "HOST_URL=${{ secrets.GCP_HOST_URL }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER_PROD }}" >> .env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD_PROD }}" >> .env
+          echo "WINDSHAFT_FILES=${{ secrets.WINDSHAFT_FILES_PROD }}" >> .env
+          echo "TIMEZONE=${{ secrets.TIMEZONE_PROD }}" >> .env
+          echo "PROTOCOL=${{ secrets.PROTOCOL_PROD }}" >> .env
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME_PROD }}" >> .env
+          echo "STATIC_ROOT=${{ secrets.STATIC_ROOT_PROD }}" >> .env
+          echo "DIST_ROOT=${{ secrets.DIST_ROOT_PROD }}" >> .env
+          echo "DRIVER_REDIS_PORT=${{ secrets.DRIVER_REDIS_PORT_PROD }}" >> .env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
+          echo "DJANGO_IMAGE_TAG=driver-django-${{ github.run_number }}" >> .env
+          echo "DATABASE_IMAGE_TAG=driver-database-${{ github.run_number }}" >> .env
+          ls -al
+          # Run any prerequisite scripts if needed
+          chmod +x pre-installation.sh && ./pre-installation.sh
+          chmod +x production_host.sh && ./production_host.sh
+          # Build the Docker images using Docker Compose
+          docker compose -f docker-compose.yml build
+
+      - name: Save Docker images to tar files
+        run: |
+          docker save -o driver-django-${{ github.run_number }}.tar driver-django:${{ github.run_number }}
+          docker save -o driver-database-${{ github.run_number }}.tar driver-database:${{ github.run_number }}
+
+      - name: Transfer Docker image tar files to Compute Engine
+        run: |
+          echo "${{ secrets.GCE_SSH_PRIVATE_KEY }}" > gce_private_key.pem
+          chmod 600 gce_private_key.pem
+          scp -o StrictHostKeyChecking=no -i gce_private_key.pem driver-django-${{ github.run_number }}.tar ubuntu@${{ secrets.GCP_HOST_NAME }}:/home/ubuntu/
+          scp -o StrictHostKeyChecking=no -i gce_private_key.pem driver-database-${{ github.run_number }}.tar ubuntu@${{ secrets.GCP_HOST_NAME }}:/home/ubuntu/
+          rm gce_private_key.pem
+
+      - name: Deploy on Compute Engine using Docker Compose
+        run: |
+          echo "${{ secrets.GCE_SSH_PRIVATE_KEY }}" > gce_private_key.pem
+          chmod 600 gce_private_key.pem
+          ssh -o StrictHostKeyChecking=no -i gce_private_key.pem ubuntu@${{ secrets.GCP_HOST_NAME }} << 'EOF'
+            cd /home/ubuntu/driver-new-tech
+            # Load the Docker images from the transferred tar files
+            docker load -i /home/ubuntu/driver-django-${{ github.run_number }}.tar
+            docker load -i /home/ubuntu/driver-database-${{ github.run_number }}.tar
+            # Remove the tar files after loading
+            rm /home/ubuntu/driver-django-${{ github.run_number }}.tar /home/ubuntu/driver-database-${{ github.run_number }}.tar
+            # Deploy updated containers
+            docker compose up -d
+            docker image prune -a -f
+EOF
+          rm gce_private_key.pem
+
+      - name: Cleanup local tar files
+        run: |
+          rm driver-django-${{ github.run_number }}.tar driver-database-${{ github.run_number }}.tar
