@@ -95,6 +95,6 @@ jobs:
           # Create new firewall rule instead of updating existing one
           gcloud compute firewall-rules create gh-actions-ssh-${{ github.run_id }} \
             --allow tcp:22 \
-            --source-ranges "${{ IP_ADDRESS }}/32" \
+            --source-ranges "$IP_ADDRESS/32" \
             --target-tags "${{ secrets.gce_firewall_target_tag }}" \
             --description "Temporary SSH access for GitHub Actions workflow ${{ github.run_id }}"
