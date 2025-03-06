@@ -7,7 +7,7 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'echo "\"${last_command}\" command failed with exit code $?."' EXIT
 
 export $(cat setup.conf)
-echo $ECR_REPO
+echo $GCR_REPO
 if ! command -v docker &> /dev/null; then
     echo "Docker not found, installing..."
     sudo apt-get update -y
