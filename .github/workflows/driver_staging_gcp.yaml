@@ -90,6 +90,8 @@ jobs:
 
       - name: Allow temporary SSH access
         run: |
+          echo "==========  check the auth login  =========="
+          gcloud auth login
           gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
           
           # Create new firewall rule instead of updating existing one
