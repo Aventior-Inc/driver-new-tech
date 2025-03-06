@@ -90,10 +90,5 @@ jobs:
 
       - name: Whitelist GitHub Actions Runner IP in GCP Firewall
         run: |
-          IP_ADDRESS="${{ env.IP_ADDRESS }}/32"
-          RULE_NAME="allow-ssh-runner-${{ github.run_number }}"
-          gcloud compute firewall-rules create $RULE_NAME \
-            --network=default \
-            --allow=tcp:22 \
-            --source-ranges=${IP_ADDRESS} \
-            --quiet
+          gcloud compute firewall-rules update default-allow-http \
+            --source-ranges="${IP_ADDRESS}"
