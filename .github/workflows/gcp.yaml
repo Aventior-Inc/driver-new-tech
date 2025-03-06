@@ -1,4 +1,4 @@
-name: Build, push & Deploy on GCP Compute Engine
+name: GCP
 
 on:
   push:
