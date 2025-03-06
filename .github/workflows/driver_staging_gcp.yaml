@@ -109,7 +109,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.GCP_HOST_NAME }} "bash /home/ubuntu/driver-new-tech/pre-installation.sh"
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.GCP_HOST_NAME }} "sudo chown -R ubuntu:ubuntu /var/www/driver-new-tech"
           sudo rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" /home/runner/work/driver-new-tech/driver-new-tech/ ubuntu@${{ secrets.GCP_HOST_NAME }}:/var/www/driver-new-tech/
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem" export_creds.sh ubuntu@${{ secrets.GCP_HOST_NAME }}:/home/ubuntu/driver-new-tech/
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i private_key.pem"  ubuntu@${{ secrets.GCP_HOST_NAME }}:/home/ubuntu/driver-new-tech/
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.GCP_HOST_NAME }} "bash /var/www/driver-new-tech/production_host.sh"
           rm private_key.pem
         env:
