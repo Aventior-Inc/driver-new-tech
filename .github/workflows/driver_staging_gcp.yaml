@@ -114,4 +114,36 @@ jobs:
           rm private_key.pem
         env:
           PRIVATE_KEY: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
-            
+
+      - name: Pulling image and Deploy on EC2 with Docker Compose
+        run: |
+          # Save the SSH private key to a file for later use
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          # SSH into EC2 and deploy using Docker Compose
+           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.GCP_HOST_NAME }} << EOF
+          
+          # Navigate to the project director
+          echo "Django Image Tag: $DJANGO_IMAGE_TAG"
+          echo "Database Image Tag: $DATABASE_IMAGE_TAG"
+
+          cd /home/ubuntu/driver-new-tech
+
+          # Pull the latest Docker image from ECR
+          cd /var/www/driver-new-tech
+          docker compose pull
+          # Restart the containers using docker-compose (this will pull the latest images
+          sudo docker compose up -d
+          sudo sleep 10
+          sudo bash configure.sh
+          # Clean up any stopped containers
+          docker image prune -a -f
+          EOF
+        env: 
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+
+      - name: Cleanup of key
+        run: |
+          # Clean up any sensitive data or files that were created
+          rm -f private_key.pem
